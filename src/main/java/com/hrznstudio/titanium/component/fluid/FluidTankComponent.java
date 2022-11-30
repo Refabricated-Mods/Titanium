@@ -172,7 +172,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>();
         addons.add(() -> new TankScreenAddon(posX, posY, this, tankType));

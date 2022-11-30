@@ -128,7 +128,7 @@ public class ItemStackFilter implements IFilter<ItemStack> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> list = new ArrayList<>();
         list.add(() -> new ItemstackFilterScreenAddon(this));

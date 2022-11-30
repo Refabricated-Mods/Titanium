@@ -1,36 +1,21 @@
-import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
-
-buildscript {
-  repositories {
-    maven { url = 'https://files.minecraftforge.net/maven' }
-    mavenCentral()
-  }
-  dependencies {
-    classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
-  }
-}
 plugins {
+  id 'java'
   id 'maven-publish'
-  id 'org.cadixdev.licenser' version '0.6.1'
-  id "com.matthewprenger.cursegradle" version "1.4.0"
-  id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "1.71.4"
+  id 'fabric-loom' version '0.12-SNAPSHOT'
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
+//apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
 
-version = "${minecraftVersion}-${project.api_version}"
+version = "${minecraft_version}-${project.api_version}"
 if (System.getenv('BUILD_NUMBER') != null) {
   version += "-" + System.getenv('BUILD_NUMBER')
 }
 group = 'com.hrznstudio'
 archivesBaseName = 'titanium'
-def isReleaseBranch = System.getenv("GIT_BRANCH") == "1.18";
+def isReleaseBranch = System.getenv("GIT_BRANCH") == "1.18-fabric";
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-license {
+/*license {
   header = project.file('HEADER')
   ext {
     year = Calendar.getInstance().get(Calendar.YEAR)
@@ -38,48 +23,7 @@ license {
     email = 'contact@hrznstudio.com'
     mod = 'Titanium'
   }
-}
-
-minecraft {
-  mappings channel: 'official', version: '1.18.2'
-  runs {
-    client = {
-      // recommended logging data for a userdev environment
-      properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-      // recommended logging level for the console
-      properties 'forge.logging.console.level': 'debug'
-      workingDirectory project.file('run').canonicalPath
-      mods {
-        titanium {
-          source sourceSets.main
-        }
-      }
-    }
-    server = {
-      // recommended logging data for a userdev environment
-      properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-      // recommended logging level for the console
-      properties 'forge.logging.console.level': 'debug'
-      workingDirectory project.file('run').canonicalPath
-      mods {
-        titanium {
-          source sourceSets.main
-        }
-      }
-    }
-    data {
-      workingDirectory project.file('run')
-      property 'forge.logging.console.level', 'info'
-      args '--mod', 'titanium', '--all', '--output', file('src/main/resources'), '--input', file('src/main/resources')
-      mods {
-        titanium {
-          source sourceSets.main
-        }
-      }
-    }
-  }
-  accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-}
+}*/
 
 repositories {
   mavenCentral()
@@ -99,32 +43,30 @@ repositories {
   maven {
     url 'https://www.dogforce-games.com/maven/'
   }
+  maven {
+    name = 'parchment'
+    url = 'https://maven.parchmentmc.org'
+  }
+  maven {
+    url = uri("https://storage.googleapis.com/devan-maven/")
+  }
+  maven {
+    name = "Fuzs Mod Resources"
+    url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+  }
 }
 dependencies {
-  minecraft 'net.minecraftforge:forge:1.18.2-40.1.18'
-
-  compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.180:api")
-  // at runtime, use the full JEI jar
-  runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.180")
-
-
-}
-
-jar {
-  manifest {
-    attributes(["Specification-Title"     : project.name,
-                "Specification-Vendor"    : "Horizon Studio",
-                "Specification-Version"   : "2.0",
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${project.api_version}",
-                "Implementation-Vendor"   : "Horizon Studio",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "Maven-Artifact"          : "${group}:${archivesBaseName}:${version}",
-                "ModSide"                 : "BOTH",
-                "Automatic-Module-Name"   : "com.hrznstdio.titanium"
-    ],)
-
+  minecraft "com.mojang:minecraft:${project.minecraft_version}"
+  mappings loom.layered() {
+    officialMojangMappings()
+    parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.mappings_version}@zip")
   }
+  modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+  modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+  include modApi("teamreborn:energy:${project.tr_energy_version}") {
+    exclude(group: "net.fabricmc.fabric-api")
+  }
+  modImplementation(include("net.minecraftforge:forgeconfigapiport-fabric:3.2.4"))
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -169,35 +111,4 @@ publishing {
       mavenLocal()
     }
   }
-}
-
-tasks.curseforge.enabled = System.env["CURSE_API"] != null
-
-curseforge {
-  if (System.env["CURSE_API"] != null) {
-    apiKey = System.env["CURSE_API"]
-  }
-  project {
-    id = '287342'
-    changelog = "https://github.com/InnovativeOnlineIndustries/Titanium/blob/changelog/CHANGELOG.md"
-    changelogType = 'markdown'
-    releaseType = 'beta'
-    addGameVersion '1.18.2'
-    mainArtifact(jar) {
-
-    }
-    addArtifact sourcesJar
-    addArtifact deobfJar
-    addArtifact javadocJar
-  }
-}
-
-task makeChangelog(type: GitChangelogTask) {
-  //fromRepo = file("../../home/runner/work/Titanium/Titanium")
-  file = new File("CHANGELOG.md")
-  untaggedName = "Version ${project.version}"
-  fromCommit = "6a5a3df3665643ea181873312e3801db7c662686"
-  fromRef = "refs/tags/2.4.0"
-  toRef = "release-1.16"
-  templateContent = file("changelog.mustache").getText("UTF-8")
 }

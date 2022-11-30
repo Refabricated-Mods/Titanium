@@ -80,7 +80,7 @@ public class ButtonComponent implements IScreenAddonProvider {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return Collections.singletonList(() -> new BasicButtonAddon(this));
     }

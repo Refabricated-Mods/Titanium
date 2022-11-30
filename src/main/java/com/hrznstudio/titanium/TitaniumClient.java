@@ -36,7 +36,7 @@ public class TitaniumClient {
         return minecraft.getEntityRenderDispatcher().getRenderer(player);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void blockOverlayEvent(DrawSelectionEvent.HighlightBlock event) {
         if (event.getTarget() != null) {
             BlockHitResult traceResult = event.getTarget();

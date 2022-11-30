@@ -56,7 +56,7 @@ public class BasicTile<T extends BasicTile<T>> extends BlockEntity {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
 
     }

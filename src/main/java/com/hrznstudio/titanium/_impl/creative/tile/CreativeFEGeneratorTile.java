@@ -11,6 +11,7 @@ import com.hrznstudio.titanium._impl.creative.CreativeFEGeneratorBlock;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -19,7 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.energy.CapabilityEnergy;
+import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -27,7 +28,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class CreativeFEGeneratorTile extends PoweredTile<CreativeFEGeneratorTile> {
 
     public CreativeFEGeneratorTile(BlockPos pos, BlockState state) {
-        super((BasicTileBlock<CreativeFEGeneratorTile>) CreativeFEGeneratorBlock.INSTANCE.getLeft().get(),CreativeFEGeneratorBlock.INSTANCE.getRight().get(), pos, state);
+        super((BasicTileBlock<CreativeFEGeneratorTile>) CreativeFEGeneratorBlock.INSTANCE.getLeft(),CreativeFEGeneratorBlock.INSTANCE.getRight(), pos, state);
     }
 
     @Override
@@ -35,9 +36,12 @@ public class CreativeFEGeneratorTile extends PoweredTile<CreativeFEGeneratorTile
         super.serverTick(level, pos, state, blockEntity);
         this.getEnergyStorage().receiveEnergy(Integer.MAX_VALUE, false);
         for (Direction direction : Direction.values()) {
-            BlockEntity tile = this.level.getBlockEntity(this.getBlockPos().relative(direction));
-            if (tile != null)
-                tile.getCapability(CapabilityEnergy.ENERGY, direction.getOpposite()).ifPresent(iEnergyStorage -> iEnergyStorage.receiveEnergy(Integer.MAX_VALUE, false));
+            EnergyStorage iEnergyStorage = EnergyStorage.SIDED.find(level, pos.relative(direction), direction.getOpposite());
+            if (iEnergyStorage != null) {
+                Transaction transaction = Transaction.openOuter();
+                iEnergyStorage.insert(Integer.MAX_VALUE, transaction);
+                transaction.commit();
+            }
         }
         markForUpdate();
     }

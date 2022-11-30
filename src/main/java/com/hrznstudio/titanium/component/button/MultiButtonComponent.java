@@ -36,7 +36,7 @@ public class MultiButtonComponent implements IScreenAddonProvider, IComponentHan
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>();
         for (ButtonComponent basicButtonAddon : basicButtonAddons) {

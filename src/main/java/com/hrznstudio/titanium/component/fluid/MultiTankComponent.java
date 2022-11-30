@@ -108,7 +108,7 @@ public class MultiTankComponent<T extends IComponentHarness> implements IScreenA
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>();
         for (FluidTankComponent<T> tank : tanks) {

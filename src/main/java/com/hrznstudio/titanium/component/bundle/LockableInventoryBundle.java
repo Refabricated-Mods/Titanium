@@ -58,7 +58,7 @@ public class LockableInventoryBundle<T extends BasicTile & IComponentHarness> im
         this.isLocked = isLocked;
         this.buttonAddon = new ButtonComponent(lockPosX, lockPosY, 14,14){
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(buttonAddon,
                     new StateButtonInfo(0, AssetTypes.BUTTON_UNLOCKED, ChatFormatting.GOLD + LangUtil.getString("tooltip.titanium.locks") +  ChatFormatting.WHITE +  " " + LangUtil.getString("tooltip.titanium.facing_handler." + inventory.getName().toLowerCase())),
@@ -81,7 +81,7 @@ public class LockableInventoryBundle<T extends BasicTile & IComponentHarness> im
 
     @Nonnull
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return inventory instanceof SidedInventoryComponent ? Collections.singletonList(() -> new LockableOverlayAddon((SidedInventoryComponent) inventory, this.lockPosX, this.lockPosY)) : Collections.emptyList();
     }

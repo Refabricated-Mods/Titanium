@@ -35,7 +35,7 @@ public class MultiFilterComponent implements IScreenAddonProvider, IComponentHan
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>();
         filters.forEach(filter -> addons.addAll(filter.getScreenAddons()));

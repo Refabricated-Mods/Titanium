@@ -12,12 +12,11 @@ import com.hrznstudio.titanium.block.RotatableBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class MachineTestBlock extends RotatableBlock<MachineTestTile> {
 
-    public static Pair<RegistryObject<Block>, RegistryObject<BlockEntityType<?>>> TEST;
+    public static Pair<Block, BlockEntityType<?>> TEST;
 
     public MachineTestBlock() {
         super("machine_test", Properties.copy(Blocks.IRON_BLOCK), MachineTestTile.class);

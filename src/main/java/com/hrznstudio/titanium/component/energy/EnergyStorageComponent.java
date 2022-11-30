@@ -75,7 +75,7 @@ public class EnergyStorageComponent<T extends IComponentHarness> extends EnergyS
 
     @Override
     @Nonnull
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return Lists.newArrayList(
             () -> new EnergyBarScreenAddon(xPos, yPos, this)

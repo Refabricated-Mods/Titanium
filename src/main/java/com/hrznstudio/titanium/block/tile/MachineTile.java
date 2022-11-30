@@ -52,7 +52,7 @@ public abstract class MachineTile<T extends MachineTile<T>> extends PoweredTile<
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         addGuiAddonFactory(getAugmentBackground());
@@ -96,7 +96,7 @@ public abstract class MachineTile<T extends MachineTile<T>> extends PoweredTile<
                 .setRange(1, 4);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public IFactory<? extends IScreenAddon> getAugmentBackground() {
         return () -> new AssetScreenAddon(AssetTypes.AUGMENT_BACKGROUND, 175, 4, true);
     }

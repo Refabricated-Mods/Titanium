@@ -170,7 +170,7 @@ public class Titanium extends ModuleController {
         LocatorTypes.register();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void clientSetup(FMLClientSetupEvent event) {
         EventManager.forge(DrawSelectionEvent.HighlightBlock.class).process(TitaniumClient::blockOverlayEvent).subscribe();
         TitaniumClient.registerModelLoader();

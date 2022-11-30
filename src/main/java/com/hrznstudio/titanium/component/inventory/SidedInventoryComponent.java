@@ -196,7 +196,7 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = super.getScreenAddons();
         if (hasFacingAddon)

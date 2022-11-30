@@ -353,7 +353,7 @@ public class ProgressBarComponent<T extends IComponentHarness> implements INBTSe
      * @return A list of GUI addon factories
      */
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return Collections.singletonList(() -> new ProgressBarScreenAddon<>(posX, posY, this));
     }
@@ -478,13 +478,13 @@ public class ProgressBarComponent<T extends IComponentHarness> implements INBTSe
             }
         };
 
-        @OnlyIn(Dist.CLIENT)
+        @Environment(EnvType.CLIENT)
         public abstract <T extends IComponentHarness> void render(PoseStack stack, Screen screen, int guiX, int guiY, IAssetProvider provider, ProgressBarScreenAddon<T> addon);
 
-        @OnlyIn(Dist.CLIENT)
+        @Environment(EnvType.CLIENT)
         public abstract int getXSize(IAssetProvider provider);
 
-        @OnlyIn(Dist.CLIENT)
+        @Environment(EnvType.CLIENT)
         public abstract int getYSize(IAssetProvider provider);
     }
 }

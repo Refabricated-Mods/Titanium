@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -33,7 +32,7 @@ public class MachineTestTile extends MachineTile<MachineTestTile> {
     private InventoryComponent<MachineTestTile> movingSlot;
 
     public MachineTestTile(BlockPos blockPos, BlockState state) {
-        super((BasicTileBlock<MachineTestTile>) MachineTestBlock.TEST.getLeft().get(), MachineTestBlock.TEST.getRight().get(), blockPos, state);
+        super((BasicTileBlock<MachineTestTile>) MachineTestBlock.TEST.getLeft(), MachineTestBlock.TEST.getRight(), blockPos, state);
         addFilter(this.filter = new ItemStackFilter("filter", 12));
         int pos = 0;
         for (int y = 0; y < 4; y++) {

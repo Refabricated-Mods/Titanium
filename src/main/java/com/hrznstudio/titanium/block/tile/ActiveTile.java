@@ -172,7 +172,7 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
         this.bundles.stream().forEach(iComponentBundle -> iComponentBundle.getScreenAddons().forEach(this::addGuiAddonFactory));
@@ -198,7 +198,7 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
         Client
      */
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void addGuiAddonFactory(IFactory<? extends IScreenAddon> factory) {
         this.guiAddons.add(factory);
     }

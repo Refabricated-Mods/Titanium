@@ -14,12 +14,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class CreativeFEGeneratorBlock extends BasicTileBlock<CreativeFEGeneratorTile> {
 
-    public static Pair<RegistryObject<Block>, RegistryObject<BlockEntityType<?>>> INSTANCE;
+    public static Pair<Block, BlockEntityType<?>> INSTANCE;
 
     public CreativeFEGeneratorBlock() {
         super("creative_fe_generator", Block.Properties.copy(Blocks.BEDROCK), CreativeFEGeneratorTile.class);
