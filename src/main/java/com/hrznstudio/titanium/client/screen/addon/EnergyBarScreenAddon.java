@@ -17,7 +17,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.energy.IEnergyStorage;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -26,10 +26,10 @@ import java.util.List;
 
 public class EnergyBarScreenAddon extends BasicScreenAddon {
 
-    private final IEnergyStorage handler;
+    private final EnergyStorage handler;
     private IAsset background;
 
-    public EnergyBarScreenAddon(int posX, int posY, IEnergyStorage handler) {
+    public EnergyBarScreenAddon(int posX, int posY, EnergyStorage handler) {
         super(posX, posY);
         this.handler = handler;
     }
@@ -51,7 +51,7 @@ public class EnergyBarScreenAddon extends BasicScreenAddon {
         screen.blit(stack, handlerPosX + offset.x, handlerPosY + offset.y + area.height - powerOffset, area.x, area.y + (area.height - powerOffset), area.width, powerOffset);
     }
 
-    public static List<Component> getTooltip(int stored, int capacity) {
+    public static List<Component> getTooltip(long stored, long capacity) {
         return Arrays.asList(new TextComponent(ChatFormatting.GOLD + "Power:"), new TextComponent(new DecimalFormat().format(stored) + ChatFormatting.GOLD + "/" + ChatFormatting.WHITE + new DecimalFormat().format(capacity) + ChatFormatting.DARK_AQUA + " FE"));
     }
 
@@ -72,11 +72,11 @@ public class EnergyBarScreenAddon extends BasicScreenAddon {
 
     @Override
     public void drawForegroundLayer(PoseStack stack, Screen screen, IAssetProvider provider, int guiX, int guiY, int mouseX, int mouseY, float partialTicks) {
-        drawForeground(stack, screen, provider, getPosX(), getPosY(), guiX, guiY, handler.getEnergyStored(), handler.getMaxEnergyStored());
+        drawForeground(stack, screen, provider, getPosX(), getPosY(), guiX, guiY, handler.getAmount(), handler.getCapacity());
     }
 
     @Override
     public List<Component> getTooltipLines() {
-        return getTooltip(handler.getEnergyStored(), handler.getMaxEnergyStored());
+        return getTooltip(handler.getAmount(), handler.getCapacity());
     }
 }

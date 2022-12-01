@@ -11,6 +11,7 @@ import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.energy.CapabilityEnergy;
+import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.Nonnull;
 
@@ -96,11 +98,15 @@ public abstract class GeneratorTile<T extends GeneratorTile<T>> extends PoweredT
         super.serverTick(level, pos, state, blockEntity);
         for (Direction facing : Direction.values()) {
             BlockPos checking = this.worldPosition.relative(facing);
+            EnergyStorage storage = EnergyStorage.SIDED.find(level, checking, facing.getOpposite());
             BlockEntity checkingTile = this.level.getBlockEntity(checking);
-            if (checkingTile != null) {
-                checkingTile.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite()).ifPresent(storage -> {
-                    this.getEnergyStorage().extractEnergy(storage.receiveEnergy(this.getEnergyStorage().extractEnergy(this.getExtractingEnergy(), true), false), false);
-                });
+            if (storage != null) {
+                Transaction transaction = Transaction.openOuter();
+                long energy = storage.insert(this.getExtractingEnergy(), transaction);
+                if (energy > 0){
+                    this.getEnergyStorage().extractEnergy(energy, transaction);
+                    transaction.commit();
+                }
             }
         }
     }

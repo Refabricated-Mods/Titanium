@@ -20,12 +20,14 @@ import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.container.addon.IContainerAddonProvider;
 import com.hrznstudio.titanium.container.addon.IntArrayReferenceHolderAddon;
 import com.hrznstudio.titanium.container.referenceholder.FluidTankReferenceHolder;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -113,8 +115,8 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
     }
 
     @Override
-    public int fill(FluidStack resource, FluidAction action) {
-        return getTankAction().canFill() ? super.fill(resource, action) : 0;
+    public long insert(FluidVariant insertedVariant, long maxAmount, TransactionContext transaction) {
+        return getTankAction().canFill() ? super.insert(insertedVariant, maxAmount, transaction) : 0;
     }
 
     @Nonnull

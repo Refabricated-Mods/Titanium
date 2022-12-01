@@ -8,10 +8,6 @@
 package com.hrznstudio.titanium.capability;
 
 import com.hrznstudio.titanium.api.capability.IStackHolder;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 
 public class CapabilityItemStackHolder {
 
