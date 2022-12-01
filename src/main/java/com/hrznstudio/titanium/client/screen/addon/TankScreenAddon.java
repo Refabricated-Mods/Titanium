@@ -16,13 +16,16 @@ import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -104,38 +107,36 @@ public class TankScreenAddon extends BasicScreenAddon {
     @Override
     public List<Component> getTooltipLines() {
         List<Component> strings = new ArrayList<>();
-        strings.add(new TextComponent(ChatFormatting.GOLD + new TranslatableComponent("tooltip.titanium.tank.fluid").getString()).append(tank.isResourceBlank() ? new TranslatableComponent("tooltip.titanium.tank.empty").withStyle(ChatFormatting.WHITE) :  new TranslatableComponent(tank.getFluid().getFluid().getAttributes().getTranslationKey(tank.getFluid()))).withStyle(ChatFormatting.WHITE));
-        strings.add(new TranslatableComponent("tooltip.titanium.tank.amount").withStyle(ChatFormatting.GOLD).append(new TextComponent(ChatFormatting.WHITE + new DecimalFormat().format(tank.getFluidAmount()) + ChatFormatting.GOLD + "/" + ChatFormatting.WHITE + new DecimalFormat().format(tank.getCapacity()) + ChatFormatting.DARK_AQUA + "mb")));
+        strings.add(new TextComponent(ChatFormatting.GOLD + new TranslatableComponent("tooltip.titanium.tank.fluid").getString()).append(tank.isResourceBlank() ? new TranslatableComponent("tooltip.titanium.tank.empty").withStyle(ChatFormatting.WHITE) :  new TranslatableComponent(tank.getResource().getFluid().getAttributes().getTranslationKey(tank.getResource().getFluid()))).withStyle(ChatFormatting.WHITE));
+        strings.add(new TranslatableComponent("tooltip.titanium.tank.amount").withStyle(ChatFormatting.GOLD).append(new TextComponent(ChatFormatting.WHITE + new DecimalFormat().format(tank.getAmount()) + ChatFormatting.GOLD + "/" + ChatFormatting.WHITE + new DecimalFormat().format(tank.getCapacity()) + ChatFormatting.DARK_AQUA + "mb")));
         ItemStack carried = Minecraft.getInstance().player.containerMenu.getCarried();
-        if (Minecraft.getInstance().player.containerMenu.getCarried().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
-            if (!carried.isEmpty()) {
-                Storage<FluidVariant> storage = FluidStorage.ITEM.find(carried, ContainerItemContext.ofPlayerCursor(Minecraft.getInstance().player, Minecraft.getInstance().player.containerMenu));
-                if (storage != null){
-                    boolean isBucket = Minecraft.getInstance().player.containerMenu.getCarried().getItem() instanceof BucketItem;
-                    long amount = isBucket ? FluidAttributes.BUCKET_VOLUME : Long.MAX_VALUE;
-                    boolean canFillFromItem = false;
-                    boolean canDrainFromItem = false;
-                    if (isBucket) {
-                        canFillFromItem = tank.fill(iFluidHandlerItem.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) == FluidAttributes.BUCKET_VOLUME;
-                        canDrainFromItem = iFluidHandlerItem.fill(tank.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) == FluidAttributes.BUCKET_VOLUME;
-                    } else {
-                        canFillFromItem = tank.fill(iFluidHandlerItem.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0;
-                        canDrainFromItem = iFluidHandlerItem.fill(tank.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0;
-                    }
-                    if (canFillFromItem)
-                        strings.add(new TranslatableComponent("tooltip.titanium.tank.can_fill_from_item").withStyle(ChatFormatting.BLUE));
-                    if (canDrainFromItem)
-                        strings.add(new TranslatableComponent("tooltip.titanium.tank.can_drain_from_item").withStyle(ChatFormatting.GOLD));
-                    if (canFillFromItem)
-                        strings.add(new TranslatableComponent("tooltip.titanium.tank.action_fill").withStyle(ChatFormatting.DARK_GRAY));
-                    if (canDrainFromItem)
-                        strings.add(new TranslatableComponent("tooltip.titanium.tank.action_drain").withStyle(ChatFormatting.DARK_GRAY));
-                    if (!canDrainFromItem && !canFillFromItem) {
-                        strings.add(new TranslatableComponent("tooltip.titanium.tank.no_action").withStyle(ChatFormatting.RED));
-                    }
+
+        if (!carried.isEmpty()) {
+            Storage<FluidVariant> storage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
+            if (storage != null){
+                boolean isBucket = carried.getItem() instanceof BucketItem;
+                long amount = isBucket ? FluidAttributes.BUCKET_VOLUME : Long.MAX_VALUE;
+                boolean canFillFromItem = false;
+                boolean canDrainFromItem = false;
+                FluidStack drain = TransferUtil.simulateExtractAnyFluid(storage, amount);
+                if (isBucket) {
+                    canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) == FluidAttributes.BUCKET_VOLUME;
+                    canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) == FluidAttributes.BUCKET_VOLUME;
+                } else {
+                    canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) > 0;
+                    canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) > 0;
                 }
-            } else {
-                strings.add(new TranslatableComponent("tooltip.titanium.tank.no_tank").withStyle(ChatFormatting.DARK_GRAY));
+                if (canFillFromItem)
+                    strings.add(new TranslatableComponent("tooltip.titanium.tank.can_fill_from_item").withStyle(ChatFormatting.BLUE));
+                if (canDrainFromItem)
+                    strings.add(new TranslatableComponent("tooltip.titanium.tank.can_drain_from_item").withStyle(ChatFormatting.GOLD));
+                if (canFillFromItem)
+                    strings.add(new TranslatableComponent("tooltip.titanium.tank.action_fill").withStyle(ChatFormatting.DARK_GRAY));
+                if (canDrainFromItem)
+                    strings.add(new TranslatableComponent("tooltip.titanium.tank.action_drain").withStyle(ChatFormatting.DARK_GRAY));
+                if (!canDrainFromItem && !canFillFromItem) {
+                    strings.add(new TranslatableComponent("tooltip.titanium.tank.no_action").withStyle(ChatFormatting.RED));
+                }
             }
         } else {
             strings.add(new TranslatableComponent("tooltip.titanium.tank.no_tank").withStyle(ChatFormatting.DARK_GRAY));
@@ -155,7 +156,8 @@ public class TankScreenAddon extends BasicScreenAddon {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!Minecraft.getInstance().player.containerMenu.getCarried().isEmpty() && Minecraft.getInstance().player.containerMenu.getCarried().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
+        ItemStack carried = Minecraft.getInstance().player.containerMenu.getCarried();
+        if (!carried.isEmpty()) {
             Screen screen = Minecraft.getInstance().screen;
             if (screen instanceof AbstractContainerScreen && ((AbstractContainerScreen) screen).getMenu() instanceof ILocatable) {
                 if (!isMouseOver(mouseX - ((AbstractContainerScreen<?>) screen).getGuiLeft(), mouseY - ((AbstractContainerScreen<?>) screen).getGuiTop()))
@@ -168,21 +170,23 @@ public class TankScreenAddon extends BasicScreenAddon {
                 } else {
                     compoundNBT.putBoolean("Invalid", true);
                 }
-                Minecraft.getInstance().player.containerMenu.getCarried().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(iFluidHandlerItem -> {
+                Storage<FluidVariant> storage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
+                if (storage != null){
                     boolean isBucket = Minecraft.getInstance().player.containerMenu.getCarried().getItem() instanceof BucketItem;
-                    int amount = isBucket ? FluidAttributes.BUCKET_VOLUME : Integer.MAX_VALUE;
+                    long amount = isBucket ? FluidAttributes.BUCKET_VOLUME : Long.MAX_VALUE;
                     boolean canFillFromItem = false;
                     boolean canDrainFromItem = false;
+                    FluidStack drain = TransferUtil.simulateExtractAnyFluid(storage, amount);
                     if (isBucket) {
-                        canFillFromItem = tank.fill(iFluidHandlerItem.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) == FluidAttributes.BUCKET_VOLUME;
-                        canDrainFromItem = iFluidHandlerItem.fill(tank.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) == FluidAttributes.BUCKET_VOLUME;
+                        canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) == FluidAttributes.BUCKET_VOLUME;
+                        canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) == FluidAttributes.BUCKET_VOLUME;
                     } else {
-                        canFillFromItem = tank.fill(iFluidHandlerItem.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0;
-                        canDrainFromItem = iFluidHandlerItem.fill(tank.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.SIMULATE) > 0;
+                        canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) > 0;
+                        canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) > 0;
                     }
                     if (canFillFromItem && button == 0) compoundNBT.putBoolean("Fill", true);
                     if (canDrainFromItem && button == 1) compoundNBT.putBoolean("Fill", false);
-                });
+                };
                 Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(locatable.getLocatorInstance(), -3, compoundNBT));
                 return true;
             }
