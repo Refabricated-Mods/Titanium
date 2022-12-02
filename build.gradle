@@ -25,6 +25,10 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
   }
 }*/
 
+loom {
+  accessWidenerPath = file("src/main/resources/titanium.accesswidener")
+}
+
 repositories {
   mavenCentral()
   maven {
@@ -51,8 +55,17 @@ repositories {
     url = uri("https://storage.googleapis.com/devan-maven/")
   }
   maven {
+    url "https://maven.terraformersmc.com"
+    content {
+      includeGroup "com.terraformersmc"
+    }
+  }
+  maven {
     name = "Fuzs Mod Resources"
     url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+  }
+  maven {
+    url "https://repo.repsy.io/mvn/distant/feltmc"
   }
   maven { url = "https://mvn.devos.one/snapshots/" }
   maven { url 'https://jitpack.io' }
@@ -76,6 +89,7 @@ dependencies {
     exclude(group: "net.fabricmc.fabric-api")
     exclude(group: "com.github.LlamaLad7")
   }
+  modImplementation(include("io.github.feltmc:felt-screen-api:1.0.0"))
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

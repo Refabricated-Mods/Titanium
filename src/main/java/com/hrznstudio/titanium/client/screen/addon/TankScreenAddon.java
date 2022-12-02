@@ -50,6 +50,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("removal")
 public class TankScreenAddon extends BasicScreenAddon {
 
     private SingleVariantStorage<FluidVariant> tank;

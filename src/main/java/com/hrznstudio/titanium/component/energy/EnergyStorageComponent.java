@@ -17,14 +17,15 @@ import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.container.addon.IContainerAddonProvider;
 import com.hrznstudio.titanium.container.addon.IntReferenceHolderAddon;
 import com.hrznstudio.titanium.container.referenceholder.FunctionReferenceHolder;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.energy.EnergyStorage;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class EnergyStorageComponent<T extends IComponentHarness> extends EnergyStorage implements
+public class EnergyStorageComponent<T extends IComponentHarness> extends SimpleEnergyStorage implements
     IScreenAddonProvider, IContainerAddonProvider {
 
     private final int xPos;
@@ -47,28 +48,26 @@ public class EnergyStorageComponent<T extends IComponentHarness> extends EnergyS
     }
 
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        int amount = super.receiveEnergy(maxReceive, simulate);
-        if (!simulate && amount > 0) {
-            this.update();
-        }
-        return amount;
+    public long insert(long maxAmount, TransactionContext transaction) {
+        transaction.addCloseCallback((t, r) -> {
+            if (r.wasCommitted()) update();
+        });
+        return super.insert(maxAmount, transaction);
     }
 
     @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-        int amount = super.extractEnergy(maxExtract, simulate);
-        if (!simulate && amount > 0) {
-            this.update();
-        }
-        return amount;
+    public long extract(long maxAmount, TransactionContext transaction) {
+        transaction.addCloseCallback((t, r) -> {
+            if (r.wasCommitted()) update();
+        });
+        return super.extract(maxAmount, transaction);
     }
 
-    public void setEnergyStored(int energy) {
-        if (energy > this.getMaxEnergyStored()) {
-            this.energy = this.getMaxEnergyStored();
+    public void setEnergyStored(long energy) {
+        if (energy > this.getCapacity()) {
+            this.amount = this.getCapacity();
         } else {
-            this.energy = Math.max(energy, 0);
+            this.amount = Math.max(energy, 0);
         }
         this.update();
     }
@@ -86,7 +85,7 @@ public class EnergyStorageComponent<T extends IComponentHarness> extends EnergyS
     @Nonnull
     public List<IFactory<? extends IContainerAddon>> getContainerAddons() {
         return Lists.newArrayList(
-            () -> new IntReferenceHolderAddon(new FunctionReferenceHolder(this::setEnergyStored, this::getEnergyStored))
+            () -> new IntReferenceHolderAddon(new FunctionReferenceHolder(this::setEnergyStored, this::getAmount))
         );
     }
 
