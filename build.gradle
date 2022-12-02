@@ -1,7 +1,10 @@
 plugins {
   id 'java'
   id 'maven-publish'
-  id 'fabric-loom' version '0.12-SNAPSHOT'
+  id 'fabric-loom' version '0.12-SNAPSHOT' apply false
+}
+if (rootProject == project){
+  apply plugin: "fabric-loom";
 }
 //apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
 
