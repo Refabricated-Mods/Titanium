@@ -13,13 +13,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.hrznstudio.titanium.Titanium;
 import com.hrznstudio.titanium.network.CompoundSerializableDataHandler;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

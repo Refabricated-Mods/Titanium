@@ -14,7 +14,6 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 public class RecipeUtil {
 
     public static <T extends Recipe<?>> List<T> getRecipes(Level world, RecipeType<T> recipeType) {
-        Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes = ObfuscationReflectionHelper.getPrivateValue(RecipeManager.class, world.getRecipeManager(), "f_44007_");
+        Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes = world.getRecipeManager();
         if (recipes != null) {
             Map<ResourceLocation, Recipe<?>> typedRecipes = recipes.get(recipeType);
             if (typedRecipes != null) {

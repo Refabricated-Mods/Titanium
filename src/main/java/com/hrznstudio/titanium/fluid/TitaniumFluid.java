@@ -7,6 +7,7 @@
 
 package com.hrznstudio.titanium.fluid;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
@@ -22,8 +23,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -42,13 +41,13 @@ public class TitaniumFluid extends FlowingFluid {
     @Override
     @Nonnull
     public Fluid getFlowing() {
-        return titaniumFluidInstance.getFlowingFluid().get();
+        return titaniumFluidInstance.getFlowingFluid();
     }
 
     @Override
     @Nonnull
     public Fluid getSource() {
-        return titaniumFluidInstance.getSourceFluid().get();
+        return titaniumFluidInstance.getSourceFluid();
     }
 
     @Override
@@ -77,7 +76,7 @@ public class TitaniumFluid extends FlowingFluid {
     @Override
     @Nonnull
     public Item getBucket() {
-        return titaniumFluidInstance.getBucketFluid().get();
+        return titaniumFluidInstance.getBucketFluid();
     }
 
     @Override
@@ -99,7 +98,7 @@ public class TitaniumFluid extends FlowingFluid {
     @Override
     @Nonnull
     protected BlockState createLegacyBlock(@Nonnull FluidState state) {
-        return titaniumFluidInstance.getBlockFluid().get().defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
+        return titaniumFluidInstance.getBlockFluid().defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
     }
 
     @Override
@@ -114,12 +113,12 @@ public class TitaniumFluid extends FlowingFluid {
 
     @Override
     public boolean isSame(Fluid fluidIn) {
-        return fluidIn == titaniumFluidInstance.getFlowingFluid().get() || fluidIn == titaniumFluidInstance.getSourceFluid().get();
+        return fluidIn == titaniumFluidInstance.getFlowingFluid() || fluidIn == titaniumFluidInstance.getSourceFluid();
     }
 
     @Override
     @Nonnull
-    protected FluidAttributes createAttributes() {
+    public FluidAttributes createAttributes() {
         return fluidAttributes.build(this);
     }
 

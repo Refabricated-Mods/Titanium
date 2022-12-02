@@ -24,11 +24,13 @@ import java.util.List;
 public class AnnotationConfigManager {
 
     public List<Type> configClasses;
+    String modid;
     public HashMap<Field, ForgeConfigSpec.ConfigValue> cachedConfigValues;
 
-    public AnnotationConfigManager() {
+    public AnnotationConfigManager(String modid) {
         configClasses = new ArrayList<>();
         cachedConfigValues = new HashMap<>();
+        this.modid = modid;
     }
 
     public void add(Type type) {
@@ -39,13 +41,13 @@ public class AnnotationConfigManager {
             scanClass(configClass, builder);
         }
         // REGISTERING CONFIG
-        File folder = new File("config" + File.separator + ModLoadingContext.get().getActiveContainer().getModId());
+        File folder = new File("config" + File.separator + modid);
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        String fileName = ModLoadingContext.get().getActiveContainer().getModId() + "/" + (type.fileName.isEmpty() ? ModLoadingContext.get().getActiveContainer().getModId() : type.fileName);
+        String fileName = modid + "/" + (type.fileName.isEmpty() ? modid : type.fileName);
         if (!fileName.endsWith(".toml")) fileName = fileName + ".toml";
-        ModLoadingContext.get().registerConfig(type.type, builder.build(), fileName);
+        ModLoadingContext.registerConfig(modid, type.type, builder.build(), fileName);
     }
 
     private void scanClass(Class configClass, ForgeConfigSpec.Builder builder) {
@@ -82,7 +84,7 @@ public class AnnotationConfigManager {
                     }
                 }
             }
-            AnnotationUtil.getFilteredAnnotatedClasses(ConfigFile.Child.class, ModLoadingContext.get().getActiveContainer().getModId()).stream()
+            AnnotationUtil.getFilteredAnnotatedClasses(ConfigFile.Child.class, modid).stream()
                     .filter(aClass -> ((ConfigFile.Child) aClass.getAnnotation(ConfigFile.Child.class)).value().equals(configClass)).forEach(aClass -> scanClass(aClass, builder));
         } catch (IllegalAccessException e) {
             e.printStackTrace();

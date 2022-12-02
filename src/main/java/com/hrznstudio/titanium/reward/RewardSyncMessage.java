@@ -11,7 +11,7 @@ import com.hrznstudio.titanium.network.Message;
 import com.hrznstudio.titanium.reward.storage.ClientRewardStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.server.level.ServerPlayer;
 
 
 public class RewardSyncMessage extends Message {
@@ -27,7 +27,7 @@ public class RewardSyncMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
+    protected void handleMessage(ServerPlayer sender) {
         Minecraft.getInstance().tell(() -> {
             ClientRewardStorage.REWARD_STORAGE.deserializeNBT(compoundNBT);
         });

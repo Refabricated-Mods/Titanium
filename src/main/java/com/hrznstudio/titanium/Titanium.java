@@ -34,7 +34,11 @@ import com.hrznstudio.titanium.reward.RewardManager;
 import com.hrznstudio.titanium.reward.RewardSyncMessage;
 import com.hrznstudio.titanium.reward.storage.RewardWorldStorage;
 import com.hrznstudio.titanium.util.SidedHandler;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
@@ -64,7 +68,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
-@Mod(Titanium.MODID)
 public class Titanium extends ModuleController {
 
     public static final String MODID = "titanium";
@@ -96,13 +99,13 @@ public class Titanium extends ModuleController {
     @Override
     protected void initModules() {
         if (true) { //ENABLE IN DEV
-            getRegistries().registerGeneric(MenuType.class, "addon_container", () -> (MenuType) IForgeMenuType.create(BasicAddonContainer::create));
-            getRegistries().registerGeneric(RecipeSerializer.class, "shapeless_enchant", () -> (RecipeSerializer) new ShapelessEnchantSerializer());
-            TestBlock.TEST = getRegistries().registerBlockWithTile("block_test", () -> (TestBlock) new TestBlock());
-            TwentyFourTestBlock.TEST = getRegistries().registerBlockWithTile("block_twenty_four_test", () -> (TwentyFourTestBlock) new TwentyFourTestBlock());
-            AssetTestBlock.TEST = getRegistries().registerBlockWithTile("block_asset_test", () -> (AssetTestBlock) new AssetTestBlock());
-            MachineTestBlock.TEST = getRegistries().registerBlockWithTile("machine_test", () -> (MachineTestBlock) new MachineTestBlock());
-            CreativeFEGeneratorBlock.INSTANCE = getRegistries().registerBlockWithTile("creative_generator", () -> new CreativeFEGeneratorBlock());
+            getRegistries().registerGeneric(Registry.MENU, "addon_container", () -> new ExtendedScreenHandlerType<>(BasicAddonContainer::create));
+            getRegistries().registerGeneric(Registry.RECIPE_SERIALIZER, "shapeless_enchant", ShapelessEnchantSerializer::new);
+            TestBlock.TEST = getRegistries().registerBlockWithTile("block_test", TestBlock::new);
+            TwentyFourTestBlock.TEST = getRegistries().registerBlockWithTile("block_twenty_four_test", TwentyFourTestBlock::new);
+            AssetTestBlock.TEST = getRegistries().registerBlockWithTile("block_asset_test", AssetTestBlock::new);
+            MachineTestBlock.TEST = getRegistries().registerBlockWithTile("machine_test", MachineTestBlock::new);
+            CreativeFEGeneratorBlock.INSTANCE = getRegistries().registerBlockWithTile("creative_generator", CreativeFEGeneratorBlock::new);
         }
         /*
         addModule(Module.builder("test_module")

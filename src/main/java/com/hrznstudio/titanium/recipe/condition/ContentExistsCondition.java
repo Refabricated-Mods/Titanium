@@ -8,18 +8,17 @@
 package com.hrznstudio.titanium.recipe.condition;
 
 import com.hrznstudio.titanium.Titanium;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.registries.IForgeRegistry;
 
 
 public class ContentExistsCondition implements ICondition {
     public static final ResourceLocation NAME = new ResourceLocation(Titanium.MODID, "content_exists");
 
-    private final IForgeRegistry<?> forgeRegistry;
+    private final Registry<?> forgeRegistry;
     private final ResourceLocation contentName;
 
-    public ContentExistsCondition(IForgeRegistry<?> forgeRegistry, ResourceLocation contentName) {
+    public ContentExistsCondition(Registry<?> forgeRegistry, ResourceLocation contentName) {
         this.forgeRegistry = forgeRegistry;
         this.contentName = contentName;
     }
@@ -34,7 +33,7 @@ public class ContentExistsCondition implements ICondition {
         return forgeRegistry.containsKey(contentName);
     }
 
-    public IForgeRegistry<?> getForgeRegistry() {
+    public Registry<?> getForgeRegistry() {
         return forgeRegistry;
     }
 

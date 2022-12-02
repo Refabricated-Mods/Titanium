@@ -9,7 +9,6 @@ package com.hrznstudio.titanium.block;
 
 import com.hrznstudio.titanium.block.tile.BasicTile;
 import com.hrznstudio.titanium.block.tile.ITickableBlockEntity;
-import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import com.hrznstudio.titanium.nbthandler.NBTManager;
 import com.hrznstudio.titanium.util.TileUtil;
 import net.minecraft.core.BlockPos;
@@ -28,9 +27,7 @@ import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public abstract class BasicTileBlock<T extends BasicTile<T>> extends BasicBlock implements EntityBlock {
 

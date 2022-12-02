@@ -13,7 +13,6 @@ import com.hrznstudio.titanium.block.tile.ActiveTile;
 import com.hrznstudio.titanium.component.inventory.InventoryComponent;
 import com.hrznstudio.titanium.datagenerator.loot.block.BasicBlockLootTables;
 import com.hrznstudio.titanium.datagenerator.loot.block.IBlockLootTableProvider;
-import com.hrznstudio.titanium.module.DeferredRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;

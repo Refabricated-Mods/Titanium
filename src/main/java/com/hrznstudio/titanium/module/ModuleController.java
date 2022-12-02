@@ -10,34 +10,29 @@ package com.hrznstudio.titanium.module;
 import com.hrznstudio.titanium.annotation.config.ConfigFile;
 import com.hrznstudio.titanium.annotation.plugin.FeaturePlugin;
 import com.hrznstudio.titanium.config.AnnotationConfigManager;
-import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.plugin.PluginManager;
 import com.hrznstudio.titanium.plugin.PluginPhase;
 import com.hrznstudio.titanium.util.AnnotationUtil;
-import net.minecraft.world.item.Item;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.registries.NewRegistryEvent;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraftforge.api.fml.event.config.ModConfigEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class ModuleController {
+public abstract class ModuleController implements ModInitializer {
     private final String modid;
-    private final AnnotationConfigManager configManager = new AnnotationConfigManager();
+    private final AnnotationConfigManager configManager;
     private final PluginManager modPluginManager;
-    private final DeferredRegistryHelper deferredRegistryHelper;
+    private final RegistryHelper registryHelper;
 
-    public ModuleController() {
-        this.modid = ModLoadingContext.get().getActiveContainer().getModId();
-        this.modPluginManager = new PluginManager(modid, FeaturePlugin.FeaturePluginType.MOD, featurePlugin -> ModList.get().isLoaded(featurePlugin.value()), true);
+    public ModuleController(String modid) {
+        this.modid = modid;
+        this.modPluginManager = new PluginManager(modid, FeaturePlugin.FeaturePluginType.MOD, featurePlugin -> FabricLoader.getInstance().isModLoaded(featurePlugin.value()), true);
         this.modPluginManager.execute(PluginPhase.CONSTRUCTION);
-        this.deferredRegistryHelper = new DeferredRegistryHelper(this.modid);
+        this.registryHelper = new RegistryHelper(this.modid);
+        this.configManager = new AnnotationConfigManager(modid);
+    }
+
+    @Override
+    public void onInitialize() {
         onPreInit();
         onInit();
         onPostInit();
@@ -65,27 +60,26 @@ public abstract class ModuleController {
             ConfigFile annotation = (ConfigFile) aClass.getAnnotation(ConfigFile.class);
             addConfig(AnnotationConfigManager.Type.of(annotation.type(), aClass).setName(annotation.value()));
         });
-        EventManager.mod(ModConfigEvent.Loading.class).process(ev -> {
-            configManager.inject();
-            this.modPluginManager.execute(PluginPhase.CONFIG_LOAD);
-        }).subscribe();
-        EventManager.mod(ModConfigEvent.Reloading.class).process(ev -> {
-            configManager.inject();
-            this.modPluginManager.execute(PluginPhase.CONFIG_RELOAD);
-        }).subscribe();
-        EventManager.mod(GatherDataEvent.class).process(this::addDataProvider).subscribe();
-        EventManager.mod(FMLClientSetupEvent.class).process(fmlClientSetupEvent -> this.modPluginManager.execute(PluginPhase.CLIENT_SETUP)).subscribe();
-        EventManager.mod(FMLCommonSetupEvent.class).process(fmlClientSetupEvent -> this.modPluginManager.execute(PluginPhase.COMMON_SETUP)).subscribe();
+        ModConfigEvent.LOADING.register(c -> {
+            if (c.getModId().equals(modid)){
+                configManager.inject();
+                this.modPluginManager.execute(PluginPhase.CONFIG_LOAD);
+            }
+        });
+        ModConfigEvent.RELOADING.register(c -> {
+            if (c.getModId().equals(modid)){
+                configManager.inject();
+                this.modPluginManager.execute(PluginPhase.CONFIG_RELOAD);
+            }
+        });
+        //EventManager.mod(FMLClientSetupEvent.class).process(fmlClientSetupEvent -> this.modPluginManager.execute(PluginPhase.CLIENT_SETUP)).subscribe();
+        this.modPluginManager.execute(PluginPhase.COMMON_SETUP);
         this.modPluginManager.execute(PluginPhase.POST_INIT);
     }
 
     protected abstract void initModules();
 
-    public void addDataProvider(GatherDataEvent event) {
-
-    }
-
-    public DeferredRegistryHelper getRegistries() {
-        return deferredRegistryHelper;
+    public RegistryHelper getRegistries() {
+        return registryHelper;
     }
 }

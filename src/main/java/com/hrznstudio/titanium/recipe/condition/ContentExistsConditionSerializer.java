@@ -11,9 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryManager;
 
 public class ContentExistsConditionSerializer implements IConditionSerializer<ContentExistsCondition> {
     @Override

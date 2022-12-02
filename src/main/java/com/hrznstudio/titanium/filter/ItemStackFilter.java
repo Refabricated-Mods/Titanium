@@ -13,10 +13,10 @@ import com.hrznstudio.titanium.api.filter.FilterAction;
 import com.hrznstudio.titanium.api.filter.FilterSlot;
 import com.hrznstudio.titanium.api.filter.IFilter;
 import com.hrznstudio.titanium.client.screen.addon.ItemstackFilterScreenAddon;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.Arrays;

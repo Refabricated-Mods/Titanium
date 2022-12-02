@@ -12,8 +12,8 @@ import com.hrznstudio.titanium.network.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
 
 
 public class TileFieldNetworkMessage extends Message {
@@ -30,12 +30,10 @@ public class TileFieldNetworkMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(NetworkEvent.Context context) {
-        context.enqueueWork(() -> {
-            BlockEntity entity = Minecraft.getInstance().player.getCommandSenderWorld().getBlockEntity(pos);
-            if (entity instanceof BasicTile){
-                ((BasicTile<?>) entity).handleSyncObject(data);
-            }
-        });
+    protected void handleMessage(ServerPlayer sender) {
+        BlockEntity entity = Minecraft.getInstance().player.getCommandSenderWorld().getBlockEntity(pos);
+        if (entity instanceof BasicTile){
+            ((BasicTile<?>) entity).handleSyncObject(data);
+        }
     }
 }
