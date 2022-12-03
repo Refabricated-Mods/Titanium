@@ -17,6 +17,7 @@ import com.hrznstudio.titanium.component.inventory.InventoryComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.VolumeSlider;
@@ -77,7 +78,9 @@ public class TwentyFourTestTile extends PoweredTile<TwentyFourTestTile> {
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, TwentyFourTestTile blockEntity) {
         super.serverTick(level, pos, state, blockEntity);
-        this.getEnergyStorage().receiveEnergy(10, false);
+        Transaction transaction = Transaction.openOuter();
+        this.getEnergyStorage().insert(10, transaction);
+        transaction.commit();
         markForUpdate();
     }
 /*

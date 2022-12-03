@@ -23,8 +23,11 @@ import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidUtil;
 import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -36,14 +39,14 @@ import java.util.function.Supplier;
 
 public class TankInteractionBundle<T extends BasicTile & IComponentHarness> implements IComponentBundle, INBTSerializable<CompoundTag> {
 
-    private final Supplier<LazyOptional<IFluidHandler>> fluidHandler;
+    private final Supplier<Storage<FluidVariant>> fluidHandler;
     private int posX;
     private int posY;
     private InventoryComponent<T> input;
     private InventoryComponent<T> output;
     private ProgressBarComponent<T> bar;
 
-    public TankInteractionBundle(Supplier<LazyOptional<IFluidHandler>> fluidHandler, int posX, int posY, T componentHarness, int maxProgress) {
+    public TankInteractionBundle(Supplier<Storage<FluidVariant>> fluidHandler, int posX, int posY, T componentHarness, int maxProgress) {
         this.fluidHandler = fluidHandler;
         this.posX = posX;
         this.posY = posY;
@@ -61,7 +64,7 @@ public class TankInteractionBundle<T extends BasicTile & IComponentHarness> impl
         this.bar = new ProgressBarComponent<T>(posX + 5, posY + 30, maxProgress)
             .setBarDirection(ProgressBarComponent.BarDirection.ARROW_DOWN)
             .setCanReset(t -> true)
-            .setCanIncrease(t -> !this.input.getStackInSlot(0).isEmpty() && this.input.getStackInSlot(0).getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent() && !getOutputStack(false).isEmpty() && (this.output.getStackInSlot(0).isEmpty() || ItemHandlerHelper.canItemStacksStack(getOutputStack(false), this.output.getStackInSlot(0))))
+            .setCanIncrease(t -> !this.input.getStackInSlot(0).isEmpty() && TitaniumFluidUtil.getFluidItemStorage(this.input.getStackInSlot(0)) != null && !getOutputStack(false).isEmpty() && (this.output.getStackInSlot(0).isEmpty() || ItemHandlerHelper.canItemStacksStack(getOutputStack(false), this.output.getStackInSlot(0))))
             .setOnFinishWork(() -> {
                 ItemStack result = getOutputStack(false);
                 if (ItemHandlerHelper.insertItem(this.output, result, true).isEmpty()) {
@@ -83,15 +86,15 @@ public class TankInteractionBundle<T extends BasicTile & IComponentHarness> impl
     }
 
     public ItemStack getOutputStack(boolean execute) {
-        return fluidHandler.get().map(iFluidHandler -> {
-            ItemStack stack = this.input.getStackInSlot(0).copy();
-            stack.setCount(1);
-            FluidActionResult result = FluidUtil.tryFillContainer(stack, iFluidHandler, Integer.MAX_VALUE, null, execute);
-            if (result.isSuccess()) return result.getResult();
-            result = TitaniumFluidUtil.tryEmptyContainer(stack, iFluidHandler, Integer.MAX_VALUE, execute);
-            if (result.isSuccess()) return result.getResult();
-            return ItemStack.EMPTY;
-        }).orElse(ItemStack.EMPTY);
+        Storage<FluidVariant> storage = fluidHandler.get();
+        if (storage == null) return ItemStack.EMPTY;
+        ItemStack stack = this.input.getStackInSlot(0).copy();
+        stack.setCount(1);
+        TitaniumFluidUtil.FluidActionResult result = TitaniumFluidUtil.tryFillContainer(stack, storage, Integer.MAX_VALUE, null, execute);
+        if (result.isSuccess()) return result.getResult();
+        result = TitaniumFluidUtil.tryEmptyContainer(stack, storage, Integer.MAX_VALUE, execute);
+        if (result.isSuccess()) return result.getResult();
+        return ItemStack.EMPTY;
     }
 
     @Override

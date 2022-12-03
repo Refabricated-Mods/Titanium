@@ -24,6 +24,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
@@ -53,11 +54,11 @@ import java.util.List;
 @SuppressWarnings("removal")
 public class TankScreenAddon extends BasicScreenAddon {
 
-    private SingleVariantStorage<FluidVariant> tank;
+    private SingleSlotStorage<FluidVariant> tank;
     private ITankAsset asset;
     private FluidTankComponent.Type type;
 
-    public TankScreenAddon(int posX, int posY, SingleVariantStorage<FluidVariant> tank, FluidTankComponent.Type type) {
+    public TankScreenAddon(int posX, int posY, SingleSlotStorage<FluidVariant> tank, FluidTankComponent.Type type) {
         super(posX, posY);
         this.tank = tank;
         this.type = type;
@@ -108,7 +109,7 @@ public class TankScreenAddon extends BasicScreenAddon {
     @Override
     public List<Component> getTooltipLines() {
         List<Component> strings = new ArrayList<>();
-        strings.add(new TextComponent(ChatFormatting.GOLD + new TranslatableComponent("tooltip.titanium.tank.fluid").getString()).append(tank.isResourceBlank() ? new TranslatableComponent("tooltip.titanium.tank.empty").withStyle(ChatFormatting.WHITE) :  new TranslatableComponent(tank.getResource().getFluid().getAttributes().getTranslationKey(tank.getResource().getFluid()))).withStyle(ChatFormatting.WHITE));
+        strings.add(new TextComponent(ChatFormatting.GOLD + new TranslatableComponent("tooltip.titanium.tank.fluid").getString()).append(tank.isResourceBlank() ? new TranslatableComponent("tooltip.titanium.tank.empty").withStyle(ChatFormatting.WHITE) :  new TranslatableComponent(tank.getResource().getFluid().getAttributes().getTranslationKey(new FluidStack(tank.getResource().getFluid(), tank.getAmount())))).withStyle(ChatFormatting.WHITE));
         strings.add(new TranslatableComponent("tooltip.titanium.tank.amount").withStyle(ChatFormatting.GOLD).append(new TextComponent(ChatFormatting.WHITE + new DecimalFormat().format(tank.getAmount()) + ChatFormatting.GOLD + "/" + ChatFormatting.WHITE + new DecimalFormat().format(tank.getCapacity()) + ChatFormatting.DARK_AQUA + "mb")));
         ItemStack carried = Minecraft.getInstance().player.containerMenu.getCarried();
 

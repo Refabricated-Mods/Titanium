@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.hrznstudio.titanium.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "RecipeManagerAccessor"
+  ],
+  "client": [
+    "client.MinecraftAccessor"
+  ],
+  "minVersion": "0.8"
+}

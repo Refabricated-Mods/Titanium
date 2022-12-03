@@ -120,7 +120,7 @@ public class InventoryComponent<T extends IComponentHarness> extends ItemStackHa
         return this;
     }
 
-    @Nonnull
+    /*@Nonnull
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
         if (stack.isEmpty()) {
@@ -148,7 +148,7 @@ public class InventoryComponent<T extends IComponentHarness> extends ItemStackHa
             onContentsChanged(slot);
         }
         return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
-    }
+    }*/
 
     @Override
     protected void onContentsChanged(int slot) {
@@ -348,7 +348,7 @@ public class InventoryComponent<T extends IComponentHarness> extends ItemStackHa
         return this;
     }
 
-    @Override
+    //@Override
     public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
         return insertPredicate.test(stack, slot);
     }

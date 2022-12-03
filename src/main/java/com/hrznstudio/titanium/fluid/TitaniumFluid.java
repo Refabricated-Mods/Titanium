@@ -8,6 +8,7 @@
 package com.hrznstudio.titanium.fluid;
 
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;

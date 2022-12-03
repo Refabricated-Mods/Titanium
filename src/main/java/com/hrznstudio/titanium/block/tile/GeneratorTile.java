@@ -18,7 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.energy.CapabilityEnergy;
 import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -32,7 +31,7 @@ public abstract class GeneratorTile<T extends GeneratorTile<T>> extends PoweredT
         super(base, blockEntityType, pos, state);
         this.addProgressBar(progressBar = getProgressBar()
                 .setComponentHarness(this.getSelf())
-                .setCanIncrease(tileEntity -> !isSmart() || this.getEnergyCapacity() - this.getEnergyStorage().getEnergyStored() >= getEnergyProducedEveryTick())
+                .setCanIncrease(tileEntity -> !isSmart() || this.getEnergyCapacity() - this.getEnergyStorage().getAmount() >= getEnergyProducedEveryTick())
                 .setIncreaseType(false)
                 .setOnStart(() -> {
                     progressBar.setMaxProgress(consumeFuel());
@@ -40,7 +39,7 @@ public abstract class GeneratorTile<T extends GeneratorTile<T>> extends PoweredT
                     markForUpdate();
                 })
                 .setCanReset(tileEntity -> canStart() && progressBar.getProgress() == 0)
-                .setOnTickWork(() -> this.getEnergyStorage().setEnergyStored(getEnergyProducedEveryTick() + this.getEnergyStorage().getEnergyStored()))
+                .setOnTickWork(() -> this.getEnergyStorage().setEnergyStored(getEnergyProducedEveryTick() + this.getEnergyStorage().getAmount()))
         );
     }
 
@@ -104,7 +103,7 @@ public abstract class GeneratorTile<T extends GeneratorTile<T>> extends PoweredT
                 Transaction transaction = Transaction.openOuter();
                 long energy = storage.insert(this.getExtractingEnergy(), transaction);
                 if (energy > 0){
-                    this.getEnergyStorage().extractEnergy(energy, transaction);
+                    this.getEnergyStorage().extract(energy, transaction);
                     transaction.commit();
                 }
             }

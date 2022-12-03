@@ -18,16 +18,22 @@ import com.hrznstudio.titanium.component.IComponentHarness;
 import com.hrznstudio.titanium.component.sideness.IFacingComponent;
 import com.hrznstudio.titanium.component.sideness.SidedComponentManager;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -101,28 +107,20 @@ public class SidedFluidTankComponent<T extends IComponentHarness> extends FluidT
         for (FacingUtil.Sideness sideness : facingModes.keySet()) {
             if (facingModes.get(sideness).equals(FaceMode.PUSH)) {
                 Direction real = FacingUtil.getFacingFromSide(blockFacing, sideness);
-                BlockEntity entity = world.getBlockEntity(pos.relative(real));
-                if (entity != null) {
-                    boolean hasWorked = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, real.getOpposite())
-                            .map(iFluidHandler -> transfer(this, iFluidHandler, workAmount))
-                            .orElse(false);
-                    if (hasWorked) {
-                        return true;
-                    }
+                Storage<FluidVariant> storage = FluidStorage.SIDED.find(world, pos, real.getOpposite());
+                boolean hasWorked = storage != null && transfer(this, storage, workAmount);
+                if (hasWorked) {
+                    return true;
                 }
             }
         }
         for (FacingUtil.Sideness sideness : facingModes.keySet()) {
             if (facingModes.get(sideness).equals(FaceMode.PULL)) {
                 Direction real = FacingUtil.getFacingFromSide(blockFacing, sideness);
-                BlockEntity entity = world.getBlockEntity(pos.relative(real));
-                if (entity != null) {
-                    boolean hasWorked = entity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, real.getOpposite())
-                            .map(iFluidHandler -> transfer(iFluidHandler, this, workAmount))
-                            .orElse(false);
-                    if (hasWorked) {
-                        return true;
-                    }
+                Storage<FluidVariant> storage = FluidStorage.SIDED.find(world, pos, real.getOpposite());
+                boolean hasWorked = storage != null && transfer(storage, this, workAmount);
+                if (hasWorked) {
+                    return true;
                 }
             }
         }
@@ -150,11 +148,13 @@ public class SidedFluidTankComponent<T extends IComponentHarness> extends FluidT
         return this;
     }
 
-    private boolean transfer(IFluidHandler from, IFluidHandler to, int workAmount) {
-        FluidStack stack = from.drain(workAmount * 100, FluidAction.SIMULATE);
+    private boolean transfer(Storage<FluidVariant> from, Storage<FluidVariant> to, long workAmount) {
+        FluidStack stack = TransferUtil.simulateExtractAnyFluid(from,workAmount * 100);
         if (!stack.isEmpty()) {
-            stack = from.drain(to.fill(stack, FluidAction.EXECUTE), FluidAction.EXECUTE);
-            return !stack.isEmpty();
+            Transaction transaction = Transaction.openOuter();
+            long drain = from.extract(stack.getType(), to.insert(stack.getType(), stack.getAmount(), transaction), transaction);
+            if (drain > 0) transaction.commit();
+            return drain > 0;
         }
         return false;
     }

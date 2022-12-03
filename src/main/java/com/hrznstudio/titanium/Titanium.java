@@ -12,6 +12,7 @@ import com.hrznstudio.titanium._impl.test.AssetTestBlock;
 import com.hrznstudio.titanium._impl.test.MachineTestBlock;
 import com.hrznstudio.titanium._impl.test.TestBlock;
 import com.hrznstudio.titanium._impl.test.TwentyFourTestBlock;
+import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.command.RewardCommand;
 import com.hrznstudio.titanium.command.RewardGrantCommand;
 import com.hrznstudio.titanium.container.BasicAddonContainer;
@@ -28,14 +29,20 @@ import com.hrznstudio.titanium.reward.storage.RewardWorldStorage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.units.qual.C;
+import org.jetbrains.annotations.Nullable;
+import team.reborn.energy.api.EnergyStorage;
 
 
 public class Titanium extends ModuleController {
@@ -68,7 +75,8 @@ public class Titanium extends ModuleController {
     @Override
     protected void initModules() {
         if (true) { //ENABLE IN DEV
-            getRegistries().registerGeneric(Registry.MENU, "addon_container", () -> new ExtendedScreenHandlerType<>(BasicAddonContainer::create));
+            BasicAddonContainer.TYPE = new ExtendedScreenHandlerType<>(BasicAddonContainer::create);
+            getRegistries().registerGeneric(Registry.MENU, "addon_container", () -> BasicAddonContainer.TYPE);
             getRegistries().registerGeneric(Registry.RECIPE_SERIALIZER, "shapeless_enchant", ShapelessEnchantSerializer::new);
             TestBlock.TEST = getRegistries().registerBlockWithTile("block_test", TestBlock::new);
             TwentyFourTestBlock.TEST = getRegistries().registerBlockWithTile("block_twenty_four_test", TwentyFourTestBlock::new);
@@ -121,6 +129,11 @@ public class Titanium extends ModuleController {
         super.onPostInit();
         RewardManager.get().getRewards().values().forEach(rewardGiver -> rewardGiver.getRewards().forEach(reward -> reward.register(EnvType.SERVER)));
         LocatorTypes.register();
+        EnergyStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
+            if (blockEntity == null) blockEntity = world.getBlockEntity(pos);
+            if (blockEntity instanceof PoweredTile<?> tile) return tile.getEnergyStorage(context);
+            return null;
+        });
     }
 
     /*@Override

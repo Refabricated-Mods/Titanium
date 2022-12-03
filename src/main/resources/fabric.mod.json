@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "titanium",
+  "version": "${version}",
+  "name": "Titanium",
+  "description": "Ports forge's caps to fabric, including using the same path.",
+  "authors": [
+    "Trinsdar"
+  ],
+  "contact": {
+    "sources": "https://github.com/Refabricated-Mods/Titanium/tree/1.18-fabric"
+  },
+  "license": "LGPL-3.0-only",
+  "environment": "*",
+  "accessWidener": "titanium.accesswidener",
+  "mixins": [
+    "titanium.mixins.json"
+  ],
+  "entrypoints": {
+    "main": [
+      "com.hrznstudio.titanium.Titanium"
+    ],
+    "client": [
+      "com.hrznstudio.titanium.TitaniumClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.4.0"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ]
+    }
+  }
+}

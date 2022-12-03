@@ -7,31 +7,96 @@
 
 package com.hrznstudio.titanium.util;
 
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.fabricators_of_create.porting_lib.util.FluidUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 /**
- * This class exists because @{@link FluidUtil}'s tryEmptyContainer doesn't work properly
+ * This class exists because I am unaware of such a method in fabric
  */
 public class TitaniumFluidUtil {
 
     @Nonnull
-    public static FluidActionResult tryEmptyContainer(@Nonnull ItemStack container, IFluidHandler fluidDestination, int maxAmount, boolean doDrain) {
+    public static FluidActionResult tryEmptyContainer(@Nonnull ItemStack container, Storage<FluidVariant> fluidDestination, long maxAmount, boolean doDrain) {
         ItemStack containerCopy = ItemHandlerHelper.copyStackWithSize(container, 1);
-        return FluidUtil.getFluidHandler(containerCopy)
-            .map(containerFluidHandler -> {
-                FluidStack transfer = FluidUtil.tryFluidTransfer(fluidDestination, containerFluidHandler, maxAmount, doDrain);
-                if (transfer.isEmpty()) {
-                    return FluidActionResult.FAILURE;
+        Optional<FluidStack> containerFirstFluid = TransferUtil.getFluidContained(containerCopy);
+        return containerFirstFluid.map(f -> {
+            Transaction transaction = Transaction.openOuter();
+            Storage<FluidVariant> fluidItem = getFluidItemStorage(containerCopy);
+            long fill = fluidDestination.insert(f.getType(), Math.min(f.getAmount(), maxAmount), transaction);
+            if (fill > 0){
+                long drain = fluidItem.extract(f.getType(), fill, transaction);
+                if (drain > 0){
+                    transaction.commit();
+                    return new FluidActionResult(containerCopy);
                 }
-                ItemStack resultContainer = containerFluidHandler.getContainer();
-                return new FluidActionResult(resultContainer);
-            })
-            .orElse(FluidActionResult.FAILURE);
+            }
+            return FluidActionResult.FAILURE;
+        }).orElse(FluidActionResult.FAILURE);
     }
 
+    @Nonnull
+    public static FluidActionResult tryFillContainer(@Nonnull ItemStack container, Storage<FluidVariant> fluidSource, long maxAmount, boolean doDrain) {
+        ItemStack containerCopy = ItemHandlerHelper.copyStackWithSize(container, 1);
+        Transaction transaction = Transaction.openOuter();
+        FluidStack stack = TransferUtil.simulateExtractAnyFluid(fluidSource, maxAmount);
+        if (!stack.isEmpty()){
+            Storage<FluidVariant> fluidItem = getFluidItemStorage(containerCopy);
+            long fill = fluidItem.simulateInsert(stack.getType(), maxAmount, null);
+            if (fill > 0){
+                long drain = fluidSource.extract(stack.getType(), fill, transaction);
+                if (drain > 0){
+                    fluidItem.insert(stack.getType(), drain, transaction);
+                    transaction.commit();
+                    return new FluidActionResult(containerCopy);
+                }
+            }
+        }
+        return FluidActionResult.FAILURE;
+    }
+
+    public static Storage<FluidVariant> getFluidItemStorage(ItemStack stack){
+        return ContainerItemContext.withInitial(stack).find(FluidStorage.ITEM);
+    }
+
+
+    public static class FluidActionResult
+    {
+        public static final FluidActionResult FAILURE = new FluidActionResult(false, ItemStack.EMPTY);
+
+        public final boolean success;
+        @Nonnull
+        public final ItemStack result;
+
+        public FluidActionResult(@Nonnull ItemStack result)
+        {
+            this(true, result);
+        }
+
+        private FluidActionResult(boolean success, @Nonnull ItemStack result)
+        {
+            this.success = success;
+            this.result = result;
+        }
+
+        public boolean isSuccess()
+        {
+            return success;
+        }
+
+        @Nonnull
+        public ItemStack getResult()
+        {
+            return result;
+        }
+    }
 }

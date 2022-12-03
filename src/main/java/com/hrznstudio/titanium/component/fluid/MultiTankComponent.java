@@ -7,6 +7,7 @@
 
 package com.hrznstudio.titanium.component.fluid;
 
+import com.google.common.collect.Iterators;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.api.client.IScreenAddonProvider;
@@ -21,6 +22,10 @@ import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,14 +35,14 @@ public class MultiTankComponent<T extends IComponentHarness> implements IScreenA
     ICapabilityHolder<MultiTankComponent.MultiTankCapabilityHandler<T>>, IComponentHandler {
 
     private final LinkedHashSet<FluidTankComponent<T>> tanks;
-    private final HashMap<FacingUtil.Sideness, LazyOptional<MultiTankCapabilityHandler<T>>> lazyOptionals;
+    private final HashMap<FacingUtil.Sideness, MultiTankCapabilityHandler<T>> lazyOptionals;
 
     public MultiTankComponent() {
         tanks = new LinkedHashSet<>();
         this.lazyOptionals = new HashMap<>();
-        lazyOptionals.put(null, LazyOptional.empty());
+        lazyOptionals.put(null, null);
         for (FacingUtil.Sideness value : FacingUtil.Sideness.values()) {
-            lazyOptionals.put(value, LazyOptional.empty());
+            lazyOptionals.put(value, null);
         }
     }
 
@@ -56,8 +61,7 @@ public class MultiTankComponent<T extends IComponentHarness> implements IScreenA
 
     private void rebuildCapability(FacingUtil.Sideness[] sides) {
         for (FacingUtil.Sideness side : sides) {
-            lazyOptionals.get(side).invalidate();
-            lazyOptionals.put(side, LazyOptional.of(() -> new MultiTankCapabilityHandler<>(getHandlersForSide(side))));
+            lazyOptionals.put(side, new MultiTankCapabilityHandler<>(getHandlersForSide(side)));
         }
     }
 
@@ -81,7 +85,7 @@ public class MultiTankComponent<T extends IComponentHarness> implements IScreenA
 
     @Nonnull
     @Override
-    public LazyOptional<MultiTankCapabilityHandler<T>> getCapabilityForSide(@Nullable FacingUtil.Sideness sideness) {
+    public MultiTankCapabilityHandler<T> getCapabilityForSide(@Nullable FacingUtil.Sideness sideness) {
         return lazyOptionals.get(sideness);
     }
 
@@ -98,7 +102,7 @@ public class MultiTankComponent<T extends IComponentHarness> implements IScreenA
     }
 
     @Override
-    public Collection<LazyOptional<MultiTankCapabilityHandler<T>>> getLazyOptionals() {
+    public Collection<MultiTankCapabilityHandler<T>> getLazyOptionals() {
         return this.lazyOptionals.values();
     }
 
@@ -125,7 +129,7 @@ public class MultiTankComponent<T extends IComponentHarness> implements IScreenA
         return addons;
     }
 
-    public static class MultiTankCapabilityHandler<T extends IComponentHarness> implements IFluidHandler {
+    public static class MultiTankCapabilityHandler<T extends IComponentHarness> implements Storage<FluidVariant> {
 
         private final List<FluidTankComponent<T>> tanks;
 
@@ -138,56 +142,28 @@ public class MultiTankComponent<T extends IComponentHarness> implements IScreenA
         }
 
         @Override
-        public int getTanks() {
-            return tanks.size();
-        }
-
-        @Nonnull
-        @Override
-        public FluidStack getFluidInTank(int tank) {
-            return tanks.get(tank).getFluid();
-        }
-
-        @Override
-        public int getTankCapacity(int tank) {
-            return tanks.get(tank).getTankCapacity(tank);
-        }
-
-        @Override
-        public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-            return tanks.get(tank).isFluidValid(stack);
-        }
-
-        @Override
-        public int fill(FluidStack resource, FluidAction action) {
+        public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
             for (FluidTankComponent<T> tank : tanks) {
-                if (tank.fill(resource, FluidAction.SIMULATE) != 0) {
-                    return tank.fill(resource, action);
+                if (tank.simulateInsert(resource, maxAmount, null) > 0) {
+                    return tank.insert(resource, maxAmount, transaction);
                 }
             }
             return 0;
         }
 
-        @Nonnull
         @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
+        public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
             for (FluidTankComponent<T> tank : tanks) {
-                if (!tank.drain(resource, FluidAction.SIMULATE).isEmpty()) {
-                    return tank.drain(resource, action);
+                if (tank.simulateExtract(resource, maxAmount, null) > 0) {
+                    return tank.extract(resource, maxAmount, transaction);
                 }
             }
-            return FluidStack.EMPTY;
+            return 0;
         }
 
-        @Nonnull
         @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
-            for (FluidTankComponent<T> tank : tanks) {
-                if (!tank.drain(maxDrain, FluidAction.SIMULATE).isEmpty()) {
-                    return tank.drain(maxDrain, action);
-                }
-            }
-            return FluidStack.EMPTY;
+        public Iterator<? extends StorageView<FluidVariant>> iterator(TransactionContext transaction) {
+            return Iterators.concat(tanks.stream().map(f -> f.iterator(transaction)).iterator());
         }
     }
 }

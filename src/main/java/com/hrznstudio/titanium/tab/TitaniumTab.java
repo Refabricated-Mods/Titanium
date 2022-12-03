@@ -7,25 +7,23 @@
 
 package com.hrznstudio.titanium.tab;
 
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Supplier;
 
-public class TitaniumTab extends CreativeModeTab {
+public class TitaniumTab{
+    String label;
     protected Supplier<ItemStack> stackSupplier;
 
     public TitaniumTab(String label, Supplier<ItemStack> stackSupplier) {
-        super(label);
+        this.label = label;
         this.stackSupplier = stackSupplier;
     }
 
-    @Override
     public ItemStack makeIcon() {
         return stackSupplier.get();
     }
 
-    @Override
     public ItemStack getIconItem() {
         return stackSupplier.get();
     }

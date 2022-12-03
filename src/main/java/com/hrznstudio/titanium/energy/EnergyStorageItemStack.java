@@ -7,6 +7,7 @@
 
 package com.hrznstudio.titanium.energy;
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import team.reborn.energy.api.EnergyStorage;
@@ -50,30 +51,22 @@ public class EnergyStorageItemStack implements EnergyStorage {
     }
 
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        if (!canReceive())
-            return 0;
-        int energyReceived = Math.min(getMaxEnergyStored() - getEnergyStored(), Math.min(getMaxReceive(), maxReceive));
-
-        if (!simulate) {
-            if (energyReceived != 0) {
-                getStackEnergyTag().putInt("energy", getEnergyStored() + energyReceived);
-            }
-        }
+    public long insert(long maxAmount, TransactionContext transaction) {
+        if (!supportsInsertion()) return 0;
+        long energyReceived = Math.min(getCapacity() - getAmount(), Math.min(getMaxReceive(), maxAmount));
+        if (energyReceived > 0) transaction.addCloseCallback((t, r) -> {
+            if (r.wasCommitted()) getStackEnergyTag().putLong("energy", getAmount() + energyReceived);
+        });
         return energyReceived;
     }
 
     @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-        if (!canExtract())
-            return 0;
-        int energyExtracted = Math.min(getEnergyStored(), Math.min(getMaxExtract(), maxExtract));
-
-        if (!simulate) {
-            if (stack != null && energyExtracted != 0) {
-                getStackEnergyTag().putInt("energy", getEnergyStored() - energyExtracted);
-            }
-        }
+    public long extract(long maxAmount, TransactionContext transaction) {
+        if (!supportsExtraction()) return 0;
+        long energyExtracted = Math.min(getAmount(), Math.min(getCapacity(), maxAmount));
+        if (energyExtracted > 0) transaction.addCloseCallback((t, r) -> {
+            if (r.wasCommitted()) getStackEnergyTag().putLong("energy", getAmount() - energyExtracted);
+        });
         return energyExtracted;
     }
 
@@ -86,22 +79,22 @@ public class EnergyStorageItemStack implements EnergyStorage {
     }
 
     @Override
-    public int getEnergyStored() {
+    public long getAmount() {
         return getStackEnergyTag().getInt(ENERGY);
     }
 
     @Override
-    public int getMaxEnergyStored() {
+    public long getCapacity() {
         return getStackEnergyTag().getInt(MAX);
     }
 
     @Override
-    public boolean canExtract() {
+    public boolean supportsExtraction() {
         return getMaxExtract() > 0;
     }
 
     @Override
-    public boolean canReceive() {
+    public boolean supportsInsertion() {
         return getMaxReceive() > 0;
     }
 }

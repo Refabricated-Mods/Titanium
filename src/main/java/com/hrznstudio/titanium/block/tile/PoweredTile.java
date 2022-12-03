@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,13 +72,8 @@ public abstract class PoweredTile<T extends PoweredTile<T>> extends ActiveTile<T
         return containerAddons;
     }
 
-    @Nonnull
-    @Override
-    public <U> LazyOptional<U> getCapability(@Nonnull Capability<U> cap, @Nullable Direction side) {
-        if (cap == CapabilityEnergy.ENERGY) {
-            return lazyEnergyStorage.cast();
-        }
-        return super.getCapability(cap, side);
+    public EnergyStorage getEnergyStorage(@Nullable Direction side){
+        return energyStorage;
     }
 
     public void setShowEnergy(boolean showEnergy) {
@@ -87,6 +83,5 @@ public abstract class PoweredTile<T extends PoweredTile<T>> extends ActiveTile<T
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        lazyEnergyStorage.invalidate();
     }
 }

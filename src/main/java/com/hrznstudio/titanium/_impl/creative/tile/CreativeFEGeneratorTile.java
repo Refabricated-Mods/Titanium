@@ -34,11 +34,13 @@ public class CreativeFEGeneratorTile extends PoweredTile<CreativeFEGeneratorTile
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, CreativeFEGeneratorTile blockEntity) {
         super.serverTick(level, pos, state, blockEntity);
-        this.getEnergyStorage().receiveEnergy(Integer.MAX_VALUE, false);
+        Transaction transaction = Transaction.openOuter();
+        this.getEnergyStorage().insert(Integer.MAX_VALUE, transaction);
+        transaction.commit();
         for (Direction direction : Direction.values()) {
             EnergyStorage iEnergyStorage = EnergyStorage.SIDED.find(level, pos.relative(direction), direction.getOpposite());
             if (iEnergyStorage != null) {
-                Transaction transaction = Transaction.openOuter();
+                transaction = Transaction.openOuter();
                 iEnergyStorage.insert(Integer.MAX_VALUE, transaction);
                 transaction.commit();
             }

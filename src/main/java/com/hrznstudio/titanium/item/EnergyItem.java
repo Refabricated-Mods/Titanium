@@ -8,15 +8,12 @@
 package com.hrznstudio.titanium.item;
 
 import com.hrznstudio.titanium.energy.EnergyStorageItemStack;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
+import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -66,12 +63,13 @@ public class EnergyItem extends BasicItem {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        return getEnergyStorage(stack).isPresent();
+        return getEnergyStorage(stack) != null;
     }
 
     @Override
     public int getBarWidth(ItemStack stack) { //TODO ???
-        return (int) Math.round(getEnergyStorage(stack).map(storage -> 1 - (double) storage.getEnergyStored() / (double) storage.getMaxEnergyStored()).orElse(0.0) * 13);
+        EnergyStorage storage = getEnergyStorage(stack);
+        return storage == null ? 0 : (int) Math.round(1 - (double) storage.getAmount() / (double) storage.getCapacity() * 13);
     }
 
     @Override
@@ -79,30 +77,13 @@ public class EnergyItem extends BasicItem {
         return 0x00E93232;
     }
 
-    public LazyOptional<IEnergyStorage> getEnergyStorage(ItemStack stack) {
-        return stack.getCapability(CapabilityEnergy.ENERGY, null);
+    public EnergyStorage getEnergyStorage(ItemStack stack) {
+        return ContainerItemContext.withInitial(stack).find(EnergyStorage.ITEM);
     }
 
-    @Nullable
+    /*@Nullable
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         return new CapabilityProvider(new EnergyStorageItemStack(stack, capacity, input, output));
-    }
-
-    public static class CapabilityProvider implements ICapabilityProvider {
-        private LazyOptional<IEnergyStorage> energyCap;
-
-        public CapabilityProvider(EnergyStorageItemStack energy) {
-            this.energyCap = LazyOptional.of(() -> energy);
-        }
-
-        @Nonnull
-        @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-            if (cap == CapabilityEnergy.ENERGY) {
-                return energyCap.cast();
-            }
-            return LazyOptional.empty();
-        }
-    }
+    }*/
 }

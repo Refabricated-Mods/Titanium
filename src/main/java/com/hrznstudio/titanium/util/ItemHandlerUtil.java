@@ -7,8 +7,10 @@
 
 package com.hrznstudio.titanium.util;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 
@@ -16,18 +18,20 @@ import javax.annotation.Nonnull;
 public class ItemHandlerUtil {
 
     @Nonnull
-    public static ItemStack getFirstItem(IItemHandler handler) {
-        for (int i = 0; i < handler.getSlots(); i++) {
-            if (!handler.getStackInSlot(i).isEmpty()) {
-                return handler.getStackInSlot(i);
+    public static ItemStack getFirstItem(Storage<ItemVariant> handler) {
+        for (StorageView<ItemVariant> view : handler.iterable(null)){
+            if (!view.isResourceBlank()){
+                return view.getResource().toStack();
             }
         }
         return ItemStack.EMPTY;
     }
 
-    public static boolean isEmpty(IItemHandler handler) {
-        for (int i = 0; i < handler.getSlots(); i++) {
-            if (!handler.getStackInSlot(i).isEmpty()) return false;
+    public static boolean isEmpty(Storage<ItemVariant> handler) {
+        for (StorageView<ItemVariant> view : handler.iterable(null)){
+            if (!view.isResourceBlank()){
+                return false;
+            }
         }
         return true;
     }
