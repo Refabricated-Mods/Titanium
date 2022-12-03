@@ -21,13 +21,27 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-public abstract class Message implements Serializable, C2SPacket {
+public abstract class Message implements Serializable, C2SPacket, S2CPacket {
 
-    protected abstract void handleMessage(ServerPlayer sender);
+    protected void handleClient(ServerPlayer sender){
+    }
+
+    protected void handleServer(){
+    }
 
     @Override
     public void handle(MinecraftServer minecraftServer, ServerPlayer serverPlayer, ServerGamePacketListenerImpl serverGamePacketListener, PacketSender packetSender, SimpleChannel simpleChannel) {
-        minecraftServer.execute(() -> handleMessage(serverPlayer));
+        minecraftServer.execute(() -> handleClient(serverPlayer));
+    }
+
+    @Override
+    public void handle(Minecraft minecraft, ClientPacketListener clientPacketListener, PacketSender packetSender, SimpleChannel simpleChannel) {
+        minecraft.execute(this::handleServer);
+    }
+
+    @Override
+    public void encode(FriendlyByteBuf friendlyByteBuf) {
+        toBytes(friendlyByteBuf);
     }
 
     public final void fromBytes(FriendlyByteBuf buf) {

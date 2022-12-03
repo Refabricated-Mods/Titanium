@@ -30,7 +30,11 @@ public class TileFieldNetworkMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(ServerPlayer sender) {
+    protected void handleClient(ServerPlayer sender) {
+    }
+
+    @Override
+    protected void handleServer() {
         BlockEntity entity = Minecraft.getInstance().player.getCommandSenderWorld().getBlockEntity(pos);
         if (entity instanceof BasicTile){
             ((BasicTile<?>) entity).handleSyncObject(data);

@@ -27,7 +27,7 @@ public class RewardSyncMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(ServerPlayer sender) {
+    protected void handleServer() {
         Minecraft.getInstance().tell(() -> {
             ClientRewardStorage.REWARD_STORAGE.deserializeNBT(compoundNBT);
         });

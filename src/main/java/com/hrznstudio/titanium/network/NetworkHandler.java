@@ -7,7 +7,6 @@
 
 package com.hrznstudio.titanium.network;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
 import me.pepperbell.simplenetworking.SimpleChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -42,11 +41,20 @@ public class NetworkHandler {
                 throw new RuntimeException(e);
             }
         });
+        network.registerS2CPacket(message, i++, buffer -> {
+            try {
+                REQ req = message.getConstructor().newInstance();
+                req.fromBytes(buffer);
+                return req;
+            } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public void sendToNearby(Level world, BlockPos pos, int distance, Message message) {
         world.getEntitiesOfClass(ServerPlayer.class, new AABB(pos).inflate(distance)).forEach(playerEntity -> {
-            network.sendToServer(message);
+            network.sendToClient(message, playerEntity);
         });
     }
 }

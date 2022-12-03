@@ -72,8 +72,6 @@ public abstract class ModuleController implements ModInitializer {
                 this.modPluginManager.execute(PluginPhase.CONFIG_RELOAD);
             }
         });
-        //EventManager.mod(FMLClientSetupEvent.class).process(fmlClientSetupEvent -> this.modPluginManager.execute(PluginPhase.CLIENT_SETUP)).subscribe();
-        this.modPluginManager.execute(PluginPhase.COMMON_SETUP);
         this.modPluginManager.execute(PluginPhase.POST_INIT);
     }
 

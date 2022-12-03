@@ -8,57 +8,34 @@
 package com.hrznstudio.titanium;
 
 import com.hrznstudio.titanium._impl.creative.CreativeFEGeneratorBlock;
-import com.hrznstudio.titanium._impl.creative.tile.CreativeFEGeneratorTile;
 import com.hrznstudio.titanium._impl.test.AssetTestBlock;
 import com.hrznstudio.titanium._impl.test.MachineTestBlock;
 import com.hrznstudio.titanium._impl.test.TestBlock;
 import com.hrznstudio.titanium._impl.test.TwentyFourTestBlock;
-import com.hrznstudio.titanium.capability.CapabilityItemStackHolder;
-import com.hrznstudio.titanium.client.screen.container.BasicAddonScreen;
 import com.hrznstudio.titanium.command.RewardCommand;
 import com.hrznstudio.titanium.command.RewardGrantCommand;
 import com.hrznstudio.titanium.container.BasicAddonContainer;
-import com.hrznstudio.titanium.datagenerator.loot.TitaniumLootTableProvider;
-import com.hrznstudio.titanium.datagenerator.model.BlockItemModelGeneratorProvider;
 import com.hrznstudio.titanium.module.ModuleController;
 import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.network.locator.LocatorTypes;
 import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
 import com.hrznstudio.titanium.network.messages.TileFieldNetworkMessage;
-import com.hrznstudio.titanium.recipe.condition.ContentExistsConditionSerializer;
-import com.hrznstudio.titanium.recipe.generator.titanium.JsonRecipeSerializerProvider;
 import com.hrznstudio.titanium.recipe.shapelessenchant.ShapelessEnchantSerializer;
 import com.hrznstudio.titanium.reward.Reward;
 import com.hrznstudio.titanium.reward.RewardManager;
 import com.hrznstudio.titanium.reward.RewardSyncMessage;
 import com.hrznstudio.titanium.reward.storage.RewardWorldStorage;
-import com.hrznstudio.titanium.util.SidedHandler;
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
-import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.MinecraftAccessor;
-import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 public class Titanium extends ModuleController {
@@ -173,7 +150,7 @@ public class Titanium extends ModuleController {
                 storage.setDirty();
             }
             CompoundTag nbt = storage.serializeSimple();
-            player.getServer().getPlayerList().getPlayers().forEach(serverPlayerEntity -> Titanium.NETWORK.get().sendTo(new RewardSyncMessage(nbt), serverPlayerEntity.connection.connection, NetworkDirection.PLAY_TO_CLIENT));
+            player.getServer().getPlayerList().getPlayers().forEach(serverPlayerEntity -> Titanium.NETWORK.get().sendToClient(new RewardSyncMessage(nbt), serverPlayerEntity));
         });
     }
 

@@ -33,7 +33,7 @@ public class ButtonClickNetworkMessage extends Message {
     }
 
     @Override
-    protected void handleMessage(ServerPlayer sender) {
+    protected void handleClient(ServerPlayer sender) {
         Optional.ofNullable(sender)
                 .flatMap(locatorInstance::locale)
                 .flatMap(CastingUtil.attemptCast(IButtonHandler.class))
