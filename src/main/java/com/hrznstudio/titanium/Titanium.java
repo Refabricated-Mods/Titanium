@@ -20,7 +20,6 @@ import com.hrznstudio.titanium.command.RewardGrantCommand;
 import com.hrznstudio.titanium.container.BasicAddonContainer;
 import com.hrznstudio.titanium.datagenerator.loot.TitaniumLootTableProvider;
 import com.hrznstudio.titanium.datagenerator.model.BlockItemModelGeneratorProvider;
-import com.hrznstudio.titanium.event.handler.EventManager;
 import com.hrznstudio.titanium.module.ModuleController;
 import com.hrznstudio.titanium.network.NetworkHandler;
 import com.hrznstudio.titanium.network.locator.LocatorTypes;
@@ -34,32 +33,26 @@ import com.hrznstudio.titanium.reward.RewardManager;
 import com.hrznstudio.titanium.reward.RewardSyncMessage;
 import com.hrznstudio.titanium.reward.storage.RewardWorldStorage;
 import com.hrznstudio.titanium.util.SidedHandler;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
+import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.MinecraftAccessor;
+import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.DrawSelectionEvent;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.common.util.NonNullLazy;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -75,20 +68,19 @@ public class Titanium extends ModuleController {
     public static NetworkHandler NETWORK = new NetworkHandler(MODID);
 
     public Titanium() {
-        NETWORK.registerMessage(ButtonClickNetworkMessage.class);
-        NETWORK.registerMessage(RewardSyncMessage.class);
-        NETWORK.registerMessage(TileFieldNetworkMessage.class);
-        SidedHandler.runOn(Dist.CLIENT, () -> () -> EventManager.mod(FMLClientSetupEvent.class).process(this::clientSetup).subscribe());
-        EventManager.mod(FMLCommonSetupEvent.class).process(this::commonSetup).subscribe();
-        EventManager.forge(PlayerEvent.PlayerLoggedInEvent.class).process(this::onPlayerLoggedIn).subscribe();
-        EventManager.forge(ServerStartingEvent.class).process(this::onServerStart).subscribe();
-        EventManager.mod(RegisterCapabilitiesEvent.class).process(CapabilityItemStackHolder::register).subscribe();
-        CraftingHelper.register(new ContentExistsConditionSerializer());
+        super(MODID);
     }
 
     @Override
     public void onPreInit() {
         super.onPreInit();
+        NETWORK.registerMessage(ButtonClickNetworkMessage.class);
+        NETWORK.registerMessage(RewardSyncMessage.class);
+        NETWORK.registerMessage(TileFieldNetworkMessage.class);
+        ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStart);
+        //EventManager.forge(PlayerEvent.PlayerLoggedInEvent.class).process(this::onPlayerLoggedIn).subscribe();
+        //EventManager.mod(RegisterCapabilitiesEvent.class).process(CapabilityItemStackHolder::register).subscribe();
+        //CraftingHelper.register(new ContentExistsConditionSerializer());
     }
 
     @Override
@@ -150,9 +142,11 @@ public class Titanium extends ModuleController {
     @Override
     public void onPostInit() {
         super.onPostInit();
+        RewardManager.get().getRewards().values().forEach(rewardGiver -> rewardGiver.getRewards().forEach(reward -> reward.register(EnvType.SERVER)));
+        LocatorTypes.register();
     }
 
-    @Override
+    /*@Override
     public void addDataProvider(GatherDataEvent event) {
         NonNullLazy<List<Block>> blocksToProcess = NonNullLazy.of(() ->
             ForgeRegistries.BLOCKS.getValues()
@@ -166,39 +160,25 @@ public class Titanium extends ModuleController {
         event.getGenerator().addProvider(new BlockItemModelGeneratorProvider(event.getGenerator(), MODID, blocksToProcess));
         event.getGenerator().addProvider(new TitaniumLootTableProvider(event.getGenerator(), blocksToProcess));
         event.getGenerator().addProvider(new JsonRecipeSerializerProvider(event.getGenerator(), MODID));
-    }
-
-    private void commonSetup(FMLCommonSetupEvent event) {
-        RewardManager.get().getRewards().values().forEach(rewardGiver -> rewardGiver.getRewards().forEach(reward -> reward.register(Dist.DEDICATED_SERVER)));
-        LocatorTypes.register();
-    }
-
-    @Environment(EnvType.CLIENT)
-    private void clientSetup(FMLClientSetupEvent event) {
-        EventManager.forge(DrawSelectionEvent.HighlightBlock.class).process(TitaniumClient::blockOverlayEvent).subscribe();
-        TitaniumClient.registerModelLoader();
-        RewardManager.get().getRewards().values().forEach(rewardGiver -> rewardGiver.getRewards().forEach(reward -> reward.register(Dist.CLIENT)));
-        MenuScreens.register(BasicAddonContainer.TYPE, BasicAddonScreen::new);
-    }
-
-    private void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        event.getPlayer().getServer().execute(() -> {
-            RewardWorldStorage storage = RewardWorldStorage.get(event.getPlayer().getServer().getLevel(Level.OVERWORLD));
-            if (!storage.getConfiguredPlayers().contains(event.getPlayer().getUUID())) {
-                for (ResourceLocation collectRewardsResourceLocation : RewardManager.get().collectRewardsResourceLocations(event.getPlayer().getUUID())) {
+    }*/
+    private void onPlayerLoggedIn(Player player) {
+        player.getServer().execute(() -> {
+            RewardWorldStorage storage = RewardWorldStorage.get(player.getServer().getLevel(Level.OVERWORLD));
+            if (!storage.getConfiguredPlayers().contains(player.getUUID())) {
+                for (ResourceLocation collectRewardsResourceLocation : RewardManager.get().collectRewardsResourceLocations(player.getUUID())) {
                     Reward reward = RewardManager.get().getReward(collectRewardsResourceLocation);
-                    storage.add(event.getPlayer().getUUID(), reward.getResourceLocation(), reward.getOptions()[0]);
+                    storage.add(player.getUUID(), reward.getResourceLocation(), reward.getOptions()[0]);
                 }
-                storage.getConfiguredPlayers().add(event.getPlayer().getUUID());
+                storage.getConfiguredPlayers().add(player.getUUID());
                 storage.setDirty();
             }
             CompoundTag nbt = storage.serializeSimple();
-            event.getPlayer().getServer().getPlayerList().getPlayers().forEach(serverPlayerEntity -> Titanium.NETWORK.get().sendTo(new RewardSyncMessage(nbt), serverPlayerEntity.connection.connection, NetworkDirection.PLAY_TO_CLIENT));
+            player.getServer().getPlayerList().getPlayers().forEach(serverPlayerEntity -> Titanium.NETWORK.get().sendTo(new RewardSyncMessage(nbt), serverPlayerEntity.connection.connection, NetworkDirection.PLAY_TO_CLIENT));
         });
     }
 
-    private void onServerStart(ServerStartingEvent event) {
-        RewardCommand.register(event.getServer().getCommands().getDispatcher());
-        RewardGrantCommand.register(event.getServer().getCommands().getDispatcher());
+    private void onServerStart(MinecraftServer server) {
+        RewardCommand.register(server.getCommands().getDispatcher());
+        RewardGrantCommand.register(server.getCommands().getDispatcher());
     }
 }
