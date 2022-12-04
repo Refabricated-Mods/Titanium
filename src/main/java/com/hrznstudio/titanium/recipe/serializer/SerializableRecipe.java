@@ -13,6 +13,9 @@ import com.hrznstudio.titanium.recipe.generator.IJsonFile;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 

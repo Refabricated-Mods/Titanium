@@ -9,20 +9,22 @@ package com.hrznstudio.titanium.recipe.condition;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
 public class ContentExistsConditionSerializer implements IConditionSerializer<ContentExistsCondition> {
     @Override
     public void write(JsonObject json, ContentExistsCondition value) {
-        json.addProperty("registry", value.getForgeRegistry().getRegistryName().toString());
+        json.addProperty("registry", value.getForgeRegistry().key().location().toString());
         json.addProperty("name", value.getContentName().toString());
     }
 
     @Override
     public ContentExistsCondition read(JsonObject json) {
         String registryName = GsonHelper.getAsString(json, "registry");
-        IForgeRegistry<?> forgeRegistry = RegistryManager.ACTIVE.getRegistry(new ResourceLocation(registryName));
+        Registry<?> forgeRegistry = Registry.REGISTRY.get(new ResourceLocation(registryName));
         if (forgeRegistry == null) {
             throw new JsonParseException("Didn't Find Registry for registry: " + registryName);
         }

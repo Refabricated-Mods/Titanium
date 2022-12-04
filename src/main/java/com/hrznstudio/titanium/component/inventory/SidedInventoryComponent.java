@@ -17,6 +17,13 @@ import com.hrznstudio.titanium.component.IComponentHarness;
 import com.hrznstudio.titanium.component.sideness.IFacingComponent;
 import com.hrznstudio.titanium.component.sideness.SidedComponentManager;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -24,11 +31,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -204,15 +206,17 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
         return addons;
     }
 
-    private int getNextSlot(IItemHandler handler, int currentSlot) {
-        for (int i = currentSlot; i < handler.getSlots(); i++) {
-            if (!handler.getStackInSlot(i).isEmpty()) return i;
+    private int getNextSlot(Storage<ItemVariant> handler, int currentSlot) {
+        int i = 0;
+        for (StorageView<ItemVariant> view : handler.iterable(Transaction.openOuter())){
+            if (!view.isResourceBlank()) return i;
+            i++;
         }
         return 0;
     }
 
-    private boolean transfer(FacingUtil.Sideness sideness, IItemHandler from, IItemHandler to, int workAmount) {
-        if (from.getSlots() <= 0) return false;
+    private boolean transfer(FacingUtil.Sideness sideness, Storage<ItemVariant> from, Storage<ItemVariant> to, int workAmount) {
+        if (!from.iterator(Transaction.openOuter()).hasNext()) return false;
         int slot = slotCache.getOrDefault(sideness, getNextSlot(from, 0));
         if (slot >= from.getSlots()) slot = 0;
         ItemStack extracted = from.extractItem(slot, workAmount, true);

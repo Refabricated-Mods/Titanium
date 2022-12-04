@@ -10,6 +10,7 @@ package com.hrznstudio.titanium.recipe.condition;
 import com.hrznstudio.titanium.Titanium;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 
 
 public class ContentExistsCondition implements ICondition {

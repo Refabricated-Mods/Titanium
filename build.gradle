@@ -93,6 +93,7 @@ dependencies {
     exclude(group: "com.github.LlamaLad7")
   }
   modImplementation(include("io.github.feltmc:felt-screen-api:1.0.0"))
+  modImplementation(include("io.github.feltmc:fabricated-forge-recipe-api:0.1"))
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

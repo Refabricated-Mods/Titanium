@@ -13,11 +13,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.hrznstudio.titanium.Titanium;
 import com.hrznstudio.titanium.network.CompoundSerializableDataHandler;
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,9 +31,10 @@ import java.util.Map;
  *
  * @param <T>
  */
-public class GenericSerializer<T extends SerializableRecipe> extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<T>, IRecipeSerializerReversed<T> {
+public class GenericSerializer<T extends SerializableRecipe>  implements RecipeSerializer<T>, IRecipeSerializerReversed<T> {
     private final Class<T> recipeClass;
     private final RecipeType<T> recipeType;
+    private ResourceLocation id;
 
     public GenericSerializer(RecipeType<T> recipeType, Class<T> recipeClass) {
         this.recipeType = recipeType;
@@ -42,6 +44,16 @@ public class GenericSerializer<T extends SerializableRecipe> extends ForgeRegist
     public GenericSerializer(ResourceLocation resourceLocation, Class<T> recipeClass) {
         this(RecipeType.register(resourceLocation.toString()), recipeClass);
         this.setRegistryName(resourceLocation);
+    }
+
+    public GenericSerializer<T> setRegistryName(ResourceLocation location){
+        if (id != null) throw new RuntimeException("Cannot set registry name if already set.");
+        this.id = location;
+        return this;
+    }
+
+    public ResourceLocation getRegistryName() {
+        return id;
     }
 
     // Reading the recipe from the json file
@@ -62,13 +74,13 @@ public class GenericSerializer<T extends SerializableRecipe> extends ForgeRegist
         }
     }
 
-    @Override
+    /*@Override
     public T fromJson(ResourceLocation recipeLoc, JsonObject recipeJson, ICondition.IContext context) {
         if (CraftingHelper.processConditions(recipeJson, "conditions", context)){
             return fromJson(recipeLoc, recipeJson);
         }
         return null;
-    }
+    }*/
 
     // Writes a json object from a recipe object
     @Override
