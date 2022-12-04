@@ -102,7 +102,7 @@ public class CompoundSerializableDataHandler {
     }
 
     public static void writeRegistryKey(FriendlyByteBuf buffer, ResourceKey<?> biome) {
-        buffer.writeResourceLocation(biome.getRegistryName());
+        buffer.writeResourceLocation(biome.registry());
         buffer.writeResourceLocation(biome.location());
     }
 

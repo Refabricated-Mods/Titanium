@@ -8,6 +8,7 @@
 package com.hrznstudio.titanium.nbthandler.data;
 
 import com.hrznstudio.titanium.api.INBTHandler;
+import com.hrznstudio.titanium.util.NBTUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -22,7 +23,7 @@ public class ItemStackNBTHandler implements INBTHandler<ItemStack> {
 
     @Override
     public boolean storeToNBT(@Nonnull CompoundTag compound, @Nonnull String name, @Nonnull ItemStack object) {
-        compound.put(name, object.serializeNBT());
+        compound.put(name, NBTUtil.tagFromStack(object));
         return true;
     }
 

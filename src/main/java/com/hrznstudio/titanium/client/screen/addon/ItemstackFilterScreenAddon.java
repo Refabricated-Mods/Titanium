@@ -15,6 +15,7 @@ import com.hrznstudio.titanium.filter.ItemStackFilter;
 import com.hrznstudio.titanium.network.locator.ILocatable;
 import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
 import com.hrznstudio.titanium.util.AssetUtil;
+import com.hrznstudio.titanium.util.NBTUtil;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -92,7 +93,7 @@ public class ItemstackFilterScreenAddon extends BasicScreenAddon {
                     CompoundTag compoundNBT = new CompoundTag();
                     compoundNBT.putString("Name", filter.getName());
                     compoundNBT.putInt("Slot", filterSlot.getFilterID());
-                    compoundNBT.put("Filter", Minecraft.getInstance().player.containerMenu.getCarried().serializeNBT());
+                    compoundNBT.put("Filter", NBTUtil.tagFromStack(Minecraft.getInstance().player.containerMenu.getCarried()));
                     Titanium.NETWORK.get().sendToServer(new ButtonClickNetworkMessage(locatable.getLocatorInstance(), -2, compoundNBT));
                     return true;
                 }

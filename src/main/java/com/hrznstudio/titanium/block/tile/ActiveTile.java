@@ -369,10 +369,6 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        if (this.multiInventoryComponent != null)
-            this.multiInventoryComponent.getLazyOptionals().forEach(LazyOptional::invalidate);
-        if (this.multiTankComponent != null)
-            this.multiTankComponent.getLazyOptionals().forEach(LazyOptional::invalidate);
     }
 
     public boolean canInteract() {

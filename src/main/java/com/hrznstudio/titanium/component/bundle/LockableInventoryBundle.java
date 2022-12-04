@@ -22,6 +22,7 @@ import com.hrznstudio.titanium.component.inventory.InventoryComponent;
 import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.util.LangUtil;
+import com.hrznstudio.titanium.util.NBTUtil;
 import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -106,7 +107,7 @@ public class LockableInventoryBundle<T extends BasicTile & IComponentHarness> im
         compoundNBT.putBoolean("Locked", this.isLocked);
         ListTag nbt = new ListTag();
         for (ItemStack stack : this.filter) {
-            nbt.add(stack.serializeNBT());
+            nbt.add(NBTUtil.tagFromStack(stack));
         }
         compoundNBT.put("Filter", nbt);
         return compoundNBT;

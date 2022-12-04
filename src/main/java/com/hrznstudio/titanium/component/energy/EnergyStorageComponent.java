@@ -85,7 +85,7 @@ public class EnergyStorageComponent<T extends IComponentHarness> extends SimpleE
     @Nonnull
     public List<IFactory<? extends IContainerAddon>> getContainerAddons() {
         return Lists.newArrayList(
-            () -> new IntReferenceHolderAddon(new FunctionReferenceHolder(this::setEnergyStored, this::getAmount))
+            () -> new IntReferenceHolderAddon(new FunctionReferenceHolder(this::setEnergyStored, () -> (int) getAmount()))
         );
     }
 

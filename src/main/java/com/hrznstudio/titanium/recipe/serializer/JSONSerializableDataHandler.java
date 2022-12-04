@@ -17,6 +17,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceKey;
@@ -71,14 +72,14 @@ public class JSONSerializableDataHandler {
             return stacks;
         });
         map(ResourceLocation.class, type -> new JsonPrimitive(type.toString()), element -> new ResourceLocation(element.getAsString()));
-        map(Block.class, type -> new JsonPrimitive(type.getRegistryName().toString()), element -> ForgeRegistries.BLOCKS.getValue(new ResourceLocation(element.getAsString())));
+        map(Block.class, type -> new JsonPrimitive(type.getRegistryName().toString()), element -> Registry.BLOCK.get(new ResourceLocation(element.getAsString())));
         map(FluidStack.class, JSONSerializableDataHandler::writeFluidStack, JSONSerializableDataHandler::readFluidStack);
 
         map(ResourceKey.class, JSONSerializableDataHandler::writeRegistryKey, JSONSerializableDataHandler::readRegistryKey);
         map(ResourceKey[].class, (registryKeys) -> {
             JsonObject object = new JsonObject();
             if (registryKeys.length > 0) {
-                object.addProperty("type", registryKeys[0].getRegistryName().toString());
+                object.addProperty("type", registryKeys[0].registry().toString());
                 JsonArray array = new JsonArray();
                 for (ResourceKey registryKey : registryKeys) {
                     array.add(registryKey.location().toString());
@@ -192,7 +193,7 @@ public class JSONSerializableDataHandler {
     }
 
     public static ItemStack readItemStack(JsonObject object) {
-        ItemStack stack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(object.get("item").getAsString())),
+        ItemStack stack = new ItemStack(Registry.ITEM.get(new ResourceLocation(object.get("item").getAsString())),
                 GsonHelper.getAsInt(object, "count", 1));
         if (object.has("nbt")) {
             try {
@@ -206,7 +207,7 @@ public class JSONSerializableDataHandler {
 
     public static JsonObject writeRegistryKey(ResourceKey<?> registryKey) {
         JsonObject object = new JsonObject();
-        object.addProperty("key", registryKey.getRegistryName().toString());
+        object.addProperty("key", registryKey.registry().toString());
         object.addProperty("value", registryKey.location().toString());
         return object;
     }

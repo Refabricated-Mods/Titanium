@@ -13,6 +13,7 @@ import com.hrznstudio.titanium.api.filter.FilterAction;
 import com.hrznstudio.titanium.api.filter.FilterSlot;
 import com.hrznstudio.titanium.api.filter.IFilter;
 import com.hrznstudio.titanium.client.screen.addon.ItemstackFilterScreenAddon;
+import com.hrznstudio.titanium.util.NBTUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
@@ -107,7 +108,7 @@ public class ItemStackFilter implements IFilter<ItemStack> {
         CompoundTag filter = new CompoundTag();
         for (FilterSlot<ItemStack> itemStackFilterSlot : this.filter) {
             if (itemStackFilterSlot != null && !itemStackFilterSlot.getFilter().isEmpty())
-                filter.put(itemStackFilterSlot.getFilterID() + "", itemStackFilterSlot.getFilter().serializeNBT());
+                filter.put(itemStackFilterSlot.getFilterID() + "", NBTUtil.tagFromStack(itemStackFilterSlot.getFilter()));
         }
         compoundNBT.put("Filter", filter);
         compoundNBT.putString("Type", type.name());
