@@ -129,11 +129,6 @@ public class Titanium extends ModuleController {
         super.onPostInit();
         RewardManager.get().getRewards().values().forEach(rewardGiver -> rewardGiver.getRewards().forEach(reward -> reward.register(EnvType.SERVER)));
         LocatorTypes.register();
-        EnergyStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
-            if (blockEntity == null) blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof PoweredTile<?> tile) return tile.getEnergyStorage(context);
-            return null;
-        });
     }
 
     /*@Override

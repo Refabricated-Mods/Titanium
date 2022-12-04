@@ -19,11 +19,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RegistryHelper {
+    List<BlockEntityType<?>> blockEntityTypes = new ArrayList<>();
 
     private final String modId;
 
@@ -40,7 +43,9 @@ public class RegistryHelper {
     }
 
     public BlockEntityType<?> registerBlockEntityType(String name, Supplier<BlockEntityType<?>> object) {
-        return registerGeneric(Registry.BLOCK_ENTITY_TYPE, name, object);
+        BlockEntityType<?> type = registerGeneric(Registry.BLOCK_ENTITY_TYPE, name, object);
+        blockEntityTypes.add(type);
+        return type;
     }
 
     public EntityType<?> registerEntityType(String name, Supplier<EntityType<?>> object) {

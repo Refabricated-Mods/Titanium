@@ -9,6 +9,7 @@ package com.hrznstudio.titanium.module;
 
 import com.hrznstudio.titanium.annotation.config.ConfigFile;
 import com.hrznstudio.titanium.annotation.plugin.FeaturePlugin;
+import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.config.AnnotationConfigManager;
 import com.hrznstudio.titanium.plugin.PluginManager;
 import com.hrznstudio.titanium.plugin.PluginPhase;
@@ -16,6 +17,7 @@ import com.hrznstudio.titanium.util.AnnotationUtil;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.api.fml.event.config.ModConfigEvent;
+import team.reborn.energy.api.EnergyStorage;
 
 public abstract class ModuleController implements ModInitializer {
     private final String modid;
@@ -36,6 +38,9 @@ public abstract class ModuleController implements ModInitializer {
         onPreInit();
         onInit();
         onPostInit();
+        registryHelper.blockEntityTypes.forEach(blockEntityType -> {
+            EnergyStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> blockEntity instanceof PoweredTile<?> tile ? tile.getEnergyStorage(direction) : null, blockEntityType);
+        });
     }
 
     private void addConfig(AnnotationConfigManager.Type type) {
