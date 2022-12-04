@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 
-public abstract class PoweredTile<T extends PoweredTile<T>> extends ActiveTile<T> {
+public abstract class PoweredTile<T extends PoweredTile<T>> extends ActiveTile<T> implements IEnergyTile {
     @Save
     private final EnergyStorageComponent<T> energyStorage;
 
@@ -72,6 +72,7 @@ public abstract class PoweredTile<T extends PoweredTile<T>> extends ActiveTile<T
         return containerAddons;
     }
 
+    @Override
     public EnergyStorage getEnergyStorage(@Nullable Direction side){
         return energyStorage;
     }

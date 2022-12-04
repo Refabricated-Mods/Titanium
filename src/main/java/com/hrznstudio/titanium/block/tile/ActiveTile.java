@@ -34,6 +34,8 @@ import com.hrznstudio.titanium.network.IButtonHandler;
 import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.instance.TileEntityLocatorInstance;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidUtil;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
@@ -74,7 +76,7 @@ import java.util.List;
 
 public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> implements IScreenAddonProvider,
     ITickableBlockEntity<T>, MenuProvider, IButtonHandler, IFacingComponentHarness, IContainerAddonProvider,
-    IHasAssetProvider {
+    IHasAssetProvider, FluidTransferable, ItemTransferable {
 
     private MultiInventoryComponent<T> multiInventoryComponent;
     private MultiProgressBarHandler<T> multiProgressBarHandler;
@@ -177,10 +179,12 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
         this.bundles.stream().forEach(iComponentBundle -> iComponentBundle.getScreenAddons().forEach(this::addGuiAddonFactory));
     }
 
+    @Override
     public Storage<ItemVariant> getItemStorage(Direction side){
         return multiInventoryComponent.getCapabilityForSide(FacingUtil.getFacingRelative(this.getFacingDirection(), side));
     }
 
+    @Override
     public Storage<FluidVariant> getFluidStorage(Direction side){
         return multiTankComponent.getCapabilityForSide(FacingUtil.getFacingRelative(this.getFacingDirection(), side));
     }
