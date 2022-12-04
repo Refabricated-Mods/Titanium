@@ -3,9 +3,11 @@
   "id": "titanium",
   "version": "${version}",
   "name": "Titanium",
-  "description": "Ports forge's caps to fabric, including using the same path.",
+  "description": "A lib for portality and industrial foregoing",
   "authors": [
-    "Trinsdar"
+    "Trinsdar",
+    "TheCodedOne",
+    "Buuz135"
   ],
   "contact": {
     "sources": "https://github.com/Refabricated-Mods/Titanium/tree/1.18-fabric"
