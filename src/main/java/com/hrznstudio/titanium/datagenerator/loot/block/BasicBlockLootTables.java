@@ -7,6 +7,7 @@
 
 package com.hrznstudio.titanium.datagenerator.loot.block;
 
+import com.hrznstudio.titanium.util.NonNullLazy;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;

@@ -10,6 +10,7 @@ package com.hrznstudio.titanium.datagenerator.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.hrznstudio.titanium.util.NonNullLazy;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;

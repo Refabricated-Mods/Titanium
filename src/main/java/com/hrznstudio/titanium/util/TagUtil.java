@@ -8,21 +8,16 @@
 package com.hrznstudio.titanium.util;
 
 import com.hrznstudio.titanium._impl.TagConfig;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.nbt.TagType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.*;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.tags.ITag;
-import net.minecraftforge.registries.tags.ITagManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,46 +26,46 @@ import java.util.List;
 
 public class TagUtil {
 
-    public static <T extends ForgeRegistryEntry<T>> boolean hasTag(IForgeRegistry<T> registry, T type, TagKey<T> tag) {
-        return registry.tags().getTag(tag).contains(type);
+    public static <T> boolean hasTag(Registry<T> registry, T type, TagKey<T> tag) {
+        return registry.getTag(tag).map(n -> n.contains(Holder.direct(type))).orElse(false);
     }
 
-    public static ITagManager<Block> getAllBlockTags() {
-        return ForgeRegistries.BLOCKS.tags();
+    public static Collection<Block> getAllBlockTags() {
+        return Registry.BLOCK.getTags().map(t -> t.getSecond().stream().map(Holder::value).toList()).flatMap(Collection::stream).toList();
     }
 
-    public static ITagManager<Item> getAllItemTags() {
-        return ForgeRegistries.ITEMS.tags();
+    public static Collection<Item> getAllItemTags() {
+        return Registry.ITEM.getTags().map(t -> t.getSecond().stream().map(Holder::value).toList()).flatMap(Collection::stream).toList();
     }
 
-    public static ITagManager<Fluid> getAllFluidTags() {
-        return ForgeRegistries.FLUIDS.tags();
+    public static Collection<Fluid> getAllFluidTags() {
+        return Registry.FLUID.getTags().map(t -> t.getSecond().stream().map(Holder::value).toList()).flatMap(Collection::stream).toList();
     }
 
-    public static <T extends ForgeRegistryEntry<T>> Collection<T> getAllEntries(IForgeRegistry<T> registry, TagKey<T>... tags) {
+    public static <T> Collection<T> getAllEntries(Registry<T> registry, TagKey<T>... tags) {
         if (tags.length == 0)
             return Collections.emptyList();
         if (tags.length == 1)
-            return registry.tags().getTag(tags[0]).stream().toList(); //getAllElements
+            return registry.getTag(tags[0]).map(n -> n.stream().map(Holder::value).toList()).orElse(List.of()); //getAllElements
         List<T> list = new ArrayList<>();
         for (TagKey<T> tag : tags) {
-            list.addAll(registry.tags().getTag(tag).stream().toList()); //getAllElements
+            list.addAll(registry.getTag(tag).map(n -> n.stream().map(Holder::value).toList()).orElse(List.of())); //getAllElements
         }
         return list;
     }
 
-    public static <T extends ForgeRegistryEntry<T>> Collection<T> getAllEntries(IForgeRegistry<T> registry, TagKey<T> tag) {
-        return registry.tags().getTag(tag).stream().toList();
+    public static <T> Collection<T> getAllEntries(Registry<T> registry, TagKey<T> tag) {
+        return registry.getTag(tag).map(n -> n.stream().map(Holder::value).toList()).orElse(List.of());
     }
 
-    public static <T extends ForgeRegistryEntry<T>> TagKey<T> getOrCreateTag(IForgeRegistry<T> registry, ResourceLocation resourceLocation) {
+    public static <T> TagKey<T> getOrCreateTag(Registry<T> registry, ResourceLocation resourceLocation) {
         /*
         if (registry.tags().stream().anyMatch(ts -> ts.getKey().location().equals(resourceLocation))) {
 
         }
         return collection.getTagOrEmpty(resourceLocation);
         */
-        return registry.tags().createTagKey(resourceLocation);
+        return TagKey.create(registry.key(), resourceLocation);
     }
 
     public static TagKey<Item> getItemTag(ResourceLocation resourceLocation) {
@@ -81,7 +76,7 @@ public class TagUtil {
         return ItemTags.create(resourceLocation);
         */
 
-        return ForgeRegistries.ITEMS.tags().stream().filter(items -> items.getKey().location().equals(resourceLocation)).map(ITag::getKey).findFirst().orElse(getOrCreateTag(ForgeRegistries.ITEMS, resourceLocation));
+        return getOrCreateTag(Registry.ITEM, resourceLocation);
     }
 
     public static TagKey<Block> getBlockTag(ResourceLocation resourceLocation) {
@@ -89,7 +84,7 @@ public class TagUtil {
             return BlockTags.getAllTags().getTag(resourceLocation);
         }
         return BlockTags.create(resourceLocation);*/
-        return ForgeRegistries.BLOCKS.tags().stream().filter(items -> items.getKey().location().equals(resourceLocation)).map(ITag::getKey).findFirst().orElse(getOrCreateTag(ForgeRegistries.BLOCKS, resourceLocation));
+        return getOrCreateTag(Registry.BLOCK, resourceLocation);
 
     }
 
@@ -98,8 +93,7 @@ public class TagUtil {
             return EntityTypeTags.getAllTags().getTag(resourceLocation);
         }
         return TagKey.create(Registry.ENTITY_TYPE_REGISTRY, resourceLocation);*/
-        return ForgeRegistries.ENTITIES.tags().stream().filter(items -> items.getKey().location().equals(resourceLocation)).map(ITag::getKey).findFirst().orElse(getOrCreateTag(ForgeRegistries.ENTITIES, resourceLocation));
-
+        return getOrCreateTag(Registry.ENTITY_TYPE, resourceLocation);
     }
 
     public static TagKey<Fluid> getFluidTag(ResourceLocation resourceLocation) {
@@ -108,16 +102,15 @@ public class TagUtil {
         }
         Registry.FLUID_REGISTRY.cast()
         return FluidTags.create(resourceLocation);*/
-        return ForgeRegistries.FLUIDS.tags().stream().filter(items -> items.getKey().location().equals(resourceLocation)).map(ITag::getKey).findFirst().orElse(getOrCreateTag(ForgeRegistries.FLUIDS, resourceLocation));
-
+        return getOrCreateTag(Registry.FLUID, resourceLocation);
     }
 
     public static ItemStack getItemWithPreference(TagKey<Item> tagKey){
-        ITag<Item> item = ForgeRegistries.ITEMS.tags().getTag(tagKey);
-        if (item.isEmpty()) return ItemStack.EMPTY;
-        List<Item> elements = item.stream().toList();
+        Collection<Item> collection = getAllEntries(Registry.ITEM, tagKey);
+        if (collection.isEmpty()) return ItemStack.EMPTY;
+        List<Item> elements = collection.stream().toList();
         for (String modid : TagConfig.ITEM_PREFERENCE) {
-            for (Item allElement : elements) {
+            for (Item allElement : collection) {
                 if (allElement.getRegistryName().getNamespace().equalsIgnoreCase(modid)) return new ItemStack(allElement);
             }
         }

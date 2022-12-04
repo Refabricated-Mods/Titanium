@@ -8,6 +8,7 @@
 package com.hrznstudio.titanium.datagenerator.loot;
 
 import com.hrznstudio.titanium.datagenerator.loot.block.BasicBlockLootTables;
+import com.hrznstudio.titanium.util.NonNullLazy;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLoot;

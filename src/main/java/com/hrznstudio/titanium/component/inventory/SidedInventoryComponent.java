@@ -17,9 +17,9 @@ import com.hrznstudio.titanium.component.IComponentHarness;
 import com.hrznstudio.titanium.component.sideness.IFacingComponent;
 import com.hrznstudio.titanium.component.sideness.SidedComponentManager;
 import com.hrznstudio.titanium.util.FacingUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -28,11 +28,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,7 +41,6 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
     private int facingHandlerX = 8;
     private int facingHandlerY = 84;
     private HashMap<FacingUtil.Sideness, FaceMode> facingModes;
-    private HashMap<FacingUtil.Sideness, Integer> slotCache;
     private int position;
     private boolean hasFacingAddon;
     private FaceMode[] validFaceModes;
@@ -51,7 +49,6 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
         super(name, xPos, yPos, size);
         this.color = DyeColor.WHITE.getFireworkColor();
         this.facingModes = new HashMap<>();
-        this.slotCache = new HashMap<>();
         for (FacingUtil.Sideness value : FacingUtil.Sideness.values()) {
             this.facingModes.put(value, FaceMode.ENABLED);
         }
@@ -127,28 +124,20 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
         for (FacingUtil.Sideness sideness : facingModes.keySet()) {
             if (facingModes.get(sideness).equals(FaceMode.PUSH)) {
                 Direction real = FacingUtil.getFacingFromSide(blockFacing, sideness);
-                BlockEntity entity = world.getBlockEntity(pos.relative(real));
-                if (entity != null) {
-                    boolean hasWorked = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, real.getOpposite())
-                            .map(iItemHandler -> transfer(sideness, this, iItemHandler, workAmount))
-                            .orElse(false);
-                    if (hasWorked) {
-                        return true;
-                    }
+                Storage<ItemVariant> storage = ItemStorage.SIDED.find(world, pos.relative(real), real.getOpposite());
+                if (storage != null){
+                    boolean hasWorked = transfer(sideness, this, storage, workAmount);
+                    if (hasWorked) return true;
                 }
             }
         }
         for (FacingUtil.Sideness sideness : facingModes.keySet()) {
             if (facingModes.get(sideness).equals(FaceMode.PULL)) {
                 Direction real = FacingUtil.getFacingFromSide(blockFacing, sideness);
-                BlockEntity entity = world.getBlockEntity(pos.relative(real));
-                if (entity != null) {
-                    boolean hasWorked = entity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, real.getOpposite())
-                            .map(iItemHandler -> transfer(sideness, iItemHandler, this, workAmount))
-                            .orElse(false);
-                    if (hasWorked) {
-                        return true;
-                    }
+                Storage<ItemVariant> storage = ItemStorage.SIDED.find(world, pos.relative(real), real.getOpposite());
+                if (storage != null){
+                    boolean hasWorked = transfer(sideness, storage, this, workAmount);
+                    if (hasWorked) return true;
                 }
             }
         }
@@ -206,37 +195,22 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
         return addons;
     }
 
-    private int getNextSlot(Storage<ItemVariant> handler, int currentSlot) {
-        int i = 0;
-        for (StorageView<ItemVariant> view : handler.iterable(Transaction.openOuter())){
-            if (!view.isResourceBlank()) return i;
-            i++;
-        }
-        return 0;
-    }
-
     private boolean transfer(FacingUtil.Sideness sideness, Storage<ItemVariant> from, Storage<ItemVariant> to, int workAmount) {
-        if (!from.iterator(Transaction.openOuter()).hasNext()) return false;
-        int slot = slotCache.getOrDefault(sideness, getNextSlot(from, 0));
-        if (slot >= from.getSlots()) slot = 0;
-        ItemStack extracted = from.extractItem(slot, workAmount, true);
-        int outSlot = isValidForAnySlot(to, extracted);
-        if (!extracted.isEmpty() && outSlot != -1) {
-            ItemStack returned = to.insertItem(outSlot, extracted, false);
-            return !from.extractItem(slot, extracted.getCount() - returned.getCount(), false).isEmpty();
-        }
-        slotCache.put(sideness, getNextSlot(from, slot + 1));
-        return false;
-    }
-
-    private int isValidForAnySlot(IItemHandler dest, ItemStack stack) {
-        for (int i = 0; i < dest.getSlots(); i++) {
-            if (!dest.isItemValid(i, stack)) continue;
-            if (dest.getStackInSlot(i).isEmpty()) return i;
-            if (ItemHandlerHelper.canItemStacksStack(dest.getStackInSlot(i), stack) && dest.getStackInSlot(i).getCount() < dest.getSlotLimit(i) && dest.getStackInSlot(i).getCount() < dest.getStackInSlot(i).getMaxStackSize()) {
-                return i;
+        for (StorageView<ItemVariant> view : from.iterable(Transaction.openOuter())){
+            if (view.isResourceBlank()) continue;
+            long extract = from.simulateExtract(view.getResource(), workAmount, null);
+            if (extract > 0){
+                Transaction transaction = Transaction.openOuter();
+                long insert = to.insert(view.getResource(), extract, transaction);
+                if (insert > 0){
+                    long realExtract = from.extract(view.getResource(), insert, transaction);
+                    if (realExtract > 0){
+                        transaction.commit();
+                        return true;
+                    }
+                }
             }
         }
-        return -1;
+        return false;
     }
 }
