@@ -27,7 +27,9 @@ import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -67,9 +69,11 @@ public class TankInteractionBundle<T extends BasicTile & IComponentHarness> impl
             .setCanIncrease(t -> !this.input.getStackInSlot(0).isEmpty() && TitaniumFluidUtil.getFluidItemStorage(this.input.getStackInSlot(0)) != null && !getOutputStack(false).isEmpty() && (this.output.getStackInSlot(0).isEmpty() || ItemHandlerHelper.canItemStacksStack(getOutputStack(false), this.output.getStackInSlot(0))))
             .setOnFinishWork(() -> {
                 ItemStack result = getOutputStack(false);
-                if (ItemHandlerHelper.insertItem(this.output, result, true).isEmpty()) {
+                Transaction transaction = Transaction.openOuter();
+                if (this.output.simulateInsert(ItemVariant.of(result), 1, null) > 0) {
                     result = getOutputStack(true);
-                    ItemHandlerHelper.insertItem(this.output, result, false);
+                    this.output.insert(ItemVariant.of(result), 1, transaction);
+                    transaction.commit();
                     this.input.getStackInSlot(0).shrink(1);
                     componentHarness.setChanged();
                 }
