@@ -132,22 +132,6 @@ public class Titanium extends ModuleController {
         RewardManager.get().getRewards().values().forEach(rewardGiver -> rewardGiver.getRewards().forEach(reward -> reward.register(EnvType.SERVER)));
         LocatorTypes.register();
     }
-
-    /*@Override
-    public void addDataProvider(GatherDataEvent event) {
-        NonNullLazy<List<Block>> blocksToProcess = NonNullLazy.of(() ->
-            ForgeRegistries.BLOCKS.getValues()
-                .stream()
-                .filter(basicBlock -> Optional.ofNullable(basicBlock.getRegistryName())
-                    .map(ResourceLocation::getNamespace)
-                    .filter(MODID::equalsIgnoreCase)
-                    .isPresent())
-                .collect(Collectors.toList())
-        );
-        event.getGenerator().addProvider(new BlockItemModelGeneratorProvider(event.getGenerator(), MODID, blocksToProcess));
-        event.getGenerator().addProvider(new TitaniumLootTableProvider(event.getGenerator(), blocksToProcess));
-        event.getGenerator().addProvider(new JsonRecipeSerializerProvider(event.getGenerator(), MODID));
-    }*/
     private void onPlayerLoggedIn(Player player) {
         player.getServer().execute(() -> {
             RewardWorldStorage storage = RewardWorldStorage.get(player.getServer().getLevel(Level.OVERWORLD));

@@ -24,6 +24,9 @@
     ],
     "client": [
       "com.hrznstudio.titanium.TitaniumClient"
+    ],
+    "fabric-datagen" : [
+      "com.hrznstudio.titanium.datagenerator.TitaniumDataGenerator"
     ]
   },
   "depends": {

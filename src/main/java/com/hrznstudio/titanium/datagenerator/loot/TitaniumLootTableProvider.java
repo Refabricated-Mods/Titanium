@@ -10,6 +10,9 @@ package com.hrznstudio.titanium.datagenerator.loot;
 import com.hrznstudio.titanium.datagenerator.loot.block.BasicBlockLootTables;
 import com.hrznstudio.titanium.util.NonNullLazy;
 import com.mojang.datafixers.util.Pair;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricLootTableProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.data.loot.LootTableProvider;
@@ -28,28 +31,25 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class TitaniumLootTableProvider extends LootTableProvider {
+public class TitaniumLootTableProvider extends FabricBlockLootTableProvider {
     private final NonNullLazy<List<Block>> blocksToProcess;
 
-    public TitaniumLootTableProvider(DataGenerator dataGenerator, NonNullLazy<List<Block>> blocks) {
+    public TitaniumLootTableProvider(FabricDataGenerator dataGenerator, NonNullLazy<List<Block>> blocks) {
         super(dataGenerator);
         this.blocksToProcess = blocks;
     }
 
-    @Override
-    @Nonnull
-    protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
-        return Collections.singletonList(
-            Pair.of(this::createBlockLootTables, LootContextParamSets.BLOCK)
-        );
-    }
-
-    protected BlockLoot createBlockLootTables() {
-        return new BasicBlockLootTables(blocksToProcess);
+    protected FabricBlockLootTableProvider createBlockLootTables() {
+        return new BasicBlockLootTables(blocksToProcess, this.dataGenerator);
     }
 
     @Override
-    protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationtracker) {
-        //super.validate(map, validationtracker);
+    public void accept(BiConsumer<ResourceLocation, LootTable.Builder> biConsumer) {
+        super.accept(biConsumer);
+        createBlockLootTables().accept(biConsumer);
+    }
+
+    @Override
+    protected void generateBlockLootTables() {
     }
 }

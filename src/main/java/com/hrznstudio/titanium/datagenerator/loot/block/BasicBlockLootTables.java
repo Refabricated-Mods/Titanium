@@ -8,7 +8,10 @@
 package com.hrznstudio.titanium.datagenerator.loot.block;
 
 import com.hrznstudio.titanium.util.NonNullLazy;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -18,16 +21,19 @@ import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
-public class BasicBlockLootTables extends BlockLoot {
+public class BasicBlockLootTables extends FabricBlockLootTableProvider {
     private final NonNullLazy<List<Block>> blocksToProcess;
 
-    public BasicBlockLootTables(NonNullLazy<List<Block>> blocksToProcess) {
+    public BasicBlockLootTables(NonNullLazy<List<Block>> blocksToProcess, FabricDataGenerator dataGenerator) {
+        super(dataGenerator);
         this.blocksToProcess = blocksToProcess;
     }
 
+
     @Override
-    public void addTables() {
+    public void generateBlockLootTables() {
         blocksToProcess.get()
             .forEach(block -> {
                 if (block instanceof IBlockLootTableProvider) {
@@ -54,7 +60,6 @@ public class BasicBlockLootTables extends BlockLoot {
                 .add(LootItem.lootTableItem(itemProvider).apply(nbtBuilder))));
     }
 
-    @Override
     protected Iterable<Block> getKnownBlocks() {
         return blocksToProcess.get();
     }
