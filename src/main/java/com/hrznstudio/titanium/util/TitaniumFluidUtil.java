@@ -31,13 +31,14 @@ public class TitaniumFluidUtil {
         Optional<FluidStack> containerFirstFluid = TransferUtil.getFluidContained(containerCopy);
         return containerFirstFluid.map(f -> {
             Transaction transaction = Transaction.openOuter();
-            Storage<FluidVariant> fluidItem = getFluidItemStorage(containerCopy);
+            ContainerItemContext context = ContainerItemContext.withInitial(containerCopy);
+            Storage<FluidVariant> fluidItem = getFluidItemStorage(context);
             long fill = fluidDestination.insert(f.getType(), Math.min(f.getAmount(), maxAmount), transaction);
             if (fill > 0){
                 long drain = fluidItem.extract(f.getType(), fill, transaction);
                 if (drain > 0){
                     transaction.commit();
-                    return new FluidActionResult(containerCopy);
+                    return new FluidActionResult(context.getItemVariant().toStack());
                 }
             }
             return FluidActionResult.FAILURE;
@@ -50,22 +51,27 @@ public class TitaniumFluidUtil {
         Transaction transaction = Transaction.openOuter();
         FluidStack stack = TransferUtil.simulateExtractAnyFluid(fluidSource, maxAmount);
         if (!stack.isEmpty()){
-            Storage<FluidVariant> fluidItem = getFluidItemStorage(containerCopy);
+            ContainerItemContext context = ContainerItemContext.withInitial(containerCopy);
+            Storage<FluidVariant> fluidItem = getFluidItemStorage(context);
             long fill = fluidItem.simulateInsert(stack.getType(), maxAmount, null);
             if (fill > 0){
                 long drain = fluidSource.extract(stack.getType(), fill, transaction);
                 if (drain > 0){
                     fluidItem.insert(stack.getType(), drain, transaction);
                     transaction.commit();
-                    return new FluidActionResult(containerCopy);
+                    return new FluidActionResult(context.getItemVariant().toStack());
                 }
             }
         }
         return FluidActionResult.FAILURE;
     }
 
+    public static Storage<FluidVariant> getFluidItemStorage(ContainerItemContext context){
+        return context.find(FluidStorage.ITEM);
+    }
+
     public static Storage<FluidVariant> getFluidItemStorage(ItemStack stack){
-        return ContainerItemContext.withInitial(stack).find(FluidStorage.ITEM);
+        return getFluidItemStorage(ContainerItemContext.withInitial(stack));
     }
 
 

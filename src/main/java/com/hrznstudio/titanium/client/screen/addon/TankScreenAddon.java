@@ -40,6 +40,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 
@@ -109,10 +110,11 @@ public class TankScreenAddon extends BasicScreenAddon {
         List<Component> strings = new ArrayList<>();
         strings.add(new TextComponent(ChatFormatting.GOLD + new TranslatableComponent("tooltip.titanium.tank.fluid").getString()).append(tank.isResourceBlank() ? new TranslatableComponent("tooltip.titanium.tank.empty").withStyle(ChatFormatting.WHITE) :  new TranslatableComponent(tank.getResource().getFluid().getAttributes().getTranslationKey(new FluidStack(tank.getResource().getFluid(), tank.getAmount())))).withStyle(ChatFormatting.WHITE));
         strings.add(new TranslatableComponent("tooltip.titanium.tank.amount").withStyle(ChatFormatting.GOLD).append(new TextComponent(ChatFormatting.WHITE + new DecimalFormat().format(tank.getAmount()) + ChatFormatting.GOLD + "/" + ChatFormatting.WHITE + new DecimalFormat().format(tank.getCapacity()) + ChatFormatting.DARK_AQUA + "mb")));
-        ItemStack carried = Minecraft.getInstance().player.containerMenu.getCarried();
+        Player player = Minecraft.getInstance().player;
+        ItemStack carried = player.containerMenu.getCarried();
 
         if (!carried.isEmpty()) {
-            Storage<FluidVariant> storage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
+            Storage<FluidVariant> storage = ContainerItemContext.ofPlayerCursor(player, player.containerMenu).find(FluidStorage.ITEM);
             if (storage != null){
                 boolean isBucket = carried.getItem() instanceof BucketItem;
                 long amount = isBucket ? FluidConstants.BUCKET : Long.MAX_VALUE;
@@ -156,7 +158,8 @@ public class TankScreenAddon extends BasicScreenAddon {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        ItemStack carried = Minecraft.getInstance().player.containerMenu.getCarried();
+        Player player = Minecraft.getInstance().player;
+        ItemStack carried = player.containerMenu.getCarried();
         if (!carried.isEmpty()) {
             Screen screen = Minecraft.getInstance().screen;
             if (screen instanceof AbstractContainerScreen && ((AbstractContainerScreen) screen).getMenu() instanceof ILocatable) {
@@ -170,7 +173,7 @@ public class TankScreenAddon extends BasicScreenAddon {
                 } else {
                     compoundNBT.putBoolean("Invalid", true);
                 }
-                Storage<FluidVariant> storage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
+                Storage<FluidVariant> storage = ContainerItemContext.ofPlayerCursor(player, player.containerMenu).find(FluidStorage.ITEM);
                 if (storage != null){
                     boolean isBucket = Minecraft.getInstance().player.containerMenu.getCarried().getItem() instanceof BucketItem;
                     long amount = isBucket ? FluidConstants.BUCKET : Long.MAX_VALUE;

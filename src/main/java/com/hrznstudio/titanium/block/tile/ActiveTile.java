@@ -303,7 +303,7 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
                 if (multiTankComponent != null) {
                     for (FluidTankComponent<T> fluidTankComponent : multiTankComponent.getTanks()) {
                         if (fluidTankComponent.getName().equalsIgnoreCase(name)) {
-                            Storage<FluidVariant> carriedStorage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
+                            Storage<FluidVariant> carriedStorage = ContainerItemContext.ofPlayerCursor(playerEntity, playerEntity.containerMenu).find(FluidStorage.ITEM);
                             if (carriedStorage instanceof SingleVariantItemStorage<FluidVariant> singleVariantItemStorage){
                                 Transaction transaction = Transaction.openOuter();
                                 long amount = carried.getItem() instanceof BucketItem ? FluidConstants.BUCKET : Integer.MAX_VALUE;
