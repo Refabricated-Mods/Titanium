@@ -34,19 +34,23 @@ import com.hrznstudio.titanium.network.IButtonHandler;
 import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.instance.TileEntityLocatorInstance;
 import com.hrznstudio.titanium.util.FacingUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidUtil;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -295,24 +299,36 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
             if (!compound.contains("Invalid") && compound.contains("Fill") && !playerEntity.containerMenu.getCarried().isEmpty()) {
                 boolean fill = compound.getBoolean("Fill");
                 String name = compound.getString("Name");
+                ItemStack carried = playerEntity.containerMenu.getCarried();
                 if (multiTankComponent != null) {
                     for (FluidTankComponent<T> fluidTankComponent : multiTankComponent.getTanks()) {
-                        if (fluidTankComponent.getName().equalsIgnoreCase(name))
-                            playerEntity.containerMenu.getCarried().getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(iFluidHandlerItem -> {
-                                if (fill) {
-                                    long amount = Minecraft.getInstance().player.containerMenu.getCarried().getItem() instanceof BucketItem ? FluidAttributes.BUCKET_VOLUME : Integer.MAX_VALUE;
-                                    amount = fluidTankComponent.fill(iFluidHandlerItem.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE);
-                                    iFluidHandlerItem.drain(amount, IFluidHandler.FluidAction.EXECUTE);
+                        if (fluidTankComponent.getName().equalsIgnoreCase(name)) {
+                            Storage<FluidVariant> carriedStorage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
+                            if (carriedStorage instanceof SingleVariantItemStorage<FluidVariant> singleVariantItemStorage){
+                                Transaction transaction = Transaction.openOuter();
+                                long amount = carried.getItem() instanceof BucketItem ? FluidConstants.BUCKET : Integer.MAX_VALUE;
+                                if (fill){
+                                    FluidStack fluidStack = TransferUtil.simulateExtractAnyFluid(carriedStorage, amount);
+                                    if (!fluidStack.isEmpty()){
+                                        amount = fluidTankComponent.insert(fluidStack.getType(), fluidStack.getAmount(), transaction);
+                                        carriedStorage.extract(fluidStack.getType(), amount, transaction);
+                                        transaction.commit();
+                                    }
                                 } else {
-                                    long amount = Minecraft.getInstance().player.containerMenu.getCarried().getItem() instanceof BucketItem ? FluidAttributes.BUCKET_VOLUME : Integer.MAX_VALUE;
-                                    amount = iFluidHandlerItem.fill(fluidTankComponent.drain(amount, IFluidHandler.FluidAction.SIMULATE), IFluidHandler.FluidAction.EXECUTE);
-                                    fluidTankComponent.drain(amount, IFluidHandler.FluidAction.EXECUTE);
+                                    FluidStack fluidStack = TransferUtil.simulateExtractAnyFluid(fluidTankComponent, amount);
+                                    if (!fluidStack.isEmpty()){
+                                        amount = carriedStorage.insert(fluidStack.getType(), fluidStack.getAmount(), transaction);
+                                        fluidTankComponent.extract(fluidStack.getType(), amount, transaction);
+                                        transaction.commit();
+                                    }
                                 }
-                                playerEntity.containerMenu.setCarried(iFluidHandlerItem.getContainer().copy());
+                                //TODO figure out
+                                //playerEntity.containerMenu.setCarried(iFluidHandlerItem.getContainer().copy());
                                 if (playerEntity instanceof ServerPlayer) {
                                     playerEntity.containerMenu.broadcastChanges();
                                 }
-                            });
+                            }
+                        }
                     }
                 }
             }

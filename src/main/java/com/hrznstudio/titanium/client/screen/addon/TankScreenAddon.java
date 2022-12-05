@@ -17,16 +17,13 @@ import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -46,7 +43,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,13 +115,13 @@ public class TankScreenAddon extends BasicScreenAddon {
             Storage<FluidVariant> storage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
             if (storage != null){
                 boolean isBucket = carried.getItem() instanceof BucketItem;
-                long amount = isBucket ? FluidAttributes.BUCKET_VOLUME : Long.MAX_VALUE;
+                long amount = isBucket ? FluidConstants.BUCKET : Long.MAX_VALUE;
                 boolean canFillFromItem = false;
                 boolean canDrainFromItem = false;
                 FluidStack drain = TransferUtil.simulateExtractAnyFluid(storage, amount);
                 if (isBucket) {
-                    canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) == FluidAttributes.BUCKET_VOLUME;
-                    canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) == FluidAttributes.BUCKET_VOLUME;
+                    canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) == FluidConstants.BUCKET;
+                    canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) == FluidConstants.BUCKET;
                 } else {
                     canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) > 0;
                     canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) > 0;
@@ -175,13 +173,13 @@ public class TankScreenAddon extends BasicScreenAddon {
                 Storage<FluidVariant> storage = ContainerItemContext.withInitial(carried).find(FluidStorage.ITEM);
                 if (storage != null){
                     boolean isBucket = Minecraft.getInstance().player.containerMenu.getCarried().getItem() instanceof BucketItem;
-                    long amount = isBucket ? FluidAttributes.BUCKET_VOLUME : Long.MAX_VALUE;
+                    long amount = isBucket ? FluidConstants.BUCKET : Long.MAX_VALUE;
                     boolean canFillFromItem = false;
                     boolean canDrainFromItem = false;
                     FluidStack drain = TransferUtil.simulateExtractAnyFluid(storage, amount);
                     if (isBucket) {
-                        canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) == FluidAttributes.BUCKET_VOLUME;
-                        canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) == FluidAttributes.BUCKET_VOLUME;
+                        canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) == FluidConstants.BUCKET;
+                        canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) == FluidConstants.BUCKET;
                     } else {
                         canFillFromItem = drain.getAmount() > 0 && tank.simulateInsert(drain.getType(), drain.getAmount(), null) > 0;
                         canDrainFromItem = storage.simulateInsert(tank.getResource(), amount, null) > 0;
