@@ -87,7 +87,8 @@ public class BasicTile<T extends BasicTile<T>> extends BlockEntity {
         return compoundTag;
     }
 
-    @Override
+    //TODO figure out
+    //@Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         load(pkt.getTag());
     }

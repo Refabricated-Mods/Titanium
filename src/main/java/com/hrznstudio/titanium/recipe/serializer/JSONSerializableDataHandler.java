@@ -15,7 +15,6 @@ import com.google.gson.JsonPrimitive;
 import com.hrznstudio.titanium.Titanium;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -26,6 +25,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.crafting.CraftingHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

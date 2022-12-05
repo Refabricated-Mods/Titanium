@@ -187,7 +187,8 @@ public class MultiInventoryComponent<T extends IComponentHarness> implements ISc
             super.setStackInSlot(slot, stack);
         }
 
-        @Override
+        //TODO do I need this?
+        //@Override
         protected void validateSlotIndex(int slot) {
             if (slot < 0 || slot >= slotAmount)
                 throw new RuntimeException("Slot " + slot + " not in valid range - [0," + slotAmount + ")");
