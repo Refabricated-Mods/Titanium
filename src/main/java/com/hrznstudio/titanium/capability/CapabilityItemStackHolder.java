@@ -8,12 +8,21 @@
 package com.hrznstudio.titanium.capability;
 
 import com.hrznstudio.titanium.api.capability.IStackHolder;
+import com.hrznstudio.titanium.item.IStackHolderItem;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 
 public class CapabilityItemStackHolder {
-    ItemApiLookup<IStackHolder, ContainerItemContext> ITEM =
+    static ItemApiLookup<IStackHolder, ContainerItemContext> ITEM =
         ItemApiLookup.get(new ResourceLocation("titanium:stack_holder"), IStackHolder.class, ContainerItemContext.class);
+
+    public static void init(){
+        ITEM.registerFallback((s, c) -> {
+            if (s.getItem() instanceof IStackHolderItem stackHolderItem) return new ItemStackHolderCapability(stackHolderItem.getHolder());
+            return null;
+        });
+    }
 
 }

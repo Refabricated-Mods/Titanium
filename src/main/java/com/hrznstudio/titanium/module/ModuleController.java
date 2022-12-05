@@ -12,6 +12,7 @@ import com.hrznstudio.titanium.annotation.plugin.FeaturePlugin;
 import com.hrznstudio.titanium.block.tile.IEnergyTile;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.config.AnnotationConfigManager;
+import com.hrznstudio.titanium.item.IFluidStorageItem;
 import com.hrznstudio.titanium.plugin.PluginManager;
 import com.hrznstudio.titanium.plugin.PluginPhase;
 import com.hrznstudio.titanium.util.AnnotationUtil;
@@ -50,7 +51,7 @@ public abstract class ModuleController implements ModInitializer {
             ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> blockEntity instanceof ItemTransferable tile ? tile.getItemStorage(direction) : null, blockEntityType);
         });
         registryHelper.items.forEach(i -> {
-
+            if (i instanceof IFluidStorageItem item) FluidStorage.ITEM.registerForItems((s, c) -> IFluidStorageItem.createFluidStorage(c, item.getCapacity()), i);
         });
     }
 

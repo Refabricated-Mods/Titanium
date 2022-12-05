@@ -13,6 +13,7 @@ import com.hrznstudio.titanium._impl.test.MachineTestBlock;
 import com.hrznstudio.titanium._impl.test.TestBlock;
 import com.hrznstudio.titanium._impl.test.TwentyFourTestBlock;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
+import com.hrznstudio.titanium.capability.CapabilityItemStackHolder;
 import com.hrznstudio.titanium.command.RewardCommand;
 import com.hrznstudio.titanium.command.RewardGrantCommand;
 import com.hrznstudio.titanium.container.BasicAddonContainer;
@@ -60,6 +61,7 @@ public class Titanium extends ModuleController {
     @Override
     public void onPreInit() {
         super.onPreInit();
+        CapabilityItemStackHolder.init();
         NETWORK.registerMessage(ButtonClickNetworkMessage.class);
         NETWORK.registerMessage(RewardSyncMessage.class);
         NETWORK.registerMessage(TileFieldNetworkMessage.class);
