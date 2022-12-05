@@ -23,6 +23,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.api.fml.event.config.ModConfigEvent;
 import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.base.SimpleBatteryItem;
 
 public abstract class ModuleController implements ModInitializer {
     private final String modid;
@@ -47,6 +48,9 @@ public abstract class ModuleController implements ModInitializer {
             EnergyStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> blockEntity instanceof IEnergyTile tile ? tile.getEnergyStorage(direction) : null, blockEntityType);
             FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> blockEntity instanceof FluidTransferable tile ? tile.getFluidStorage(direction) : null, blockEntityType);
             ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> blockEntity instanceof ItemTransferable tile ? tile.getItemStorage(direction) : null, blockEntityType);
+        });
+        registryHelper.items.forEach(i -> {
+
         });
     }
 

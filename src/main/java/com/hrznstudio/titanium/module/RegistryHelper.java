@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 
 public class RegistryHelper {
     List<BlockEntityType<?>> blockEntityTypes = new ArrayList<>();
+    List<Item> items = new ArrayList<>();
 
     private final String modId;
 
@@ -35,7 +36,10 @@ public class RegistryHelper {
     }
 
     private  <T> T register(Registry<T> cl, String name, Supplier<T> object) {
-        return Registry.register(cl, new ResourceLocation(modId, name), object.get());
+        T object1 = Registry.register(cl, new ResourceLocation(modId, name), object.get());
+        if (object1 instanceof Item item) items.add(item);
+        if (object1 instanceof BlockEntityType<?> type) blockEntityTypes.add(type);
+        return object1;
     }
 
     public <T> T registerGeneric(Registry<T> cl, String name, Supplier<T> object) {
@@ -43,9 +47,7 @@ public class RegistryHelper {
     }
 
     public BlockEntityType<?> registerBlockEntityType(String name, Supplier<BlockEntityType<?>> object) {
-        BlockEntityType<?> type = registerGeneric(Registry.BLOCK_ENTITY_TYPE, name, object);
-        blockEntityTypes.add(type);
-        return type;
+        return registerGeneric(Registry.BLOCK_ENTITY_TYPE, name, object);
     }
 
     public EntityType<?> registerEntityType(String name, Supplier<EntityType<?>> object) {
