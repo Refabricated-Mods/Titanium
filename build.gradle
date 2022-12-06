@@ -68,6 +68,7 @@ repositories {
   maven {
     url = uri("https://storage.googleapis.com/devan-maven/")
   }
+  maven { url "https://maven.shedaniel.me/" }
   maven {
     url "https://maven.terraformersmc.com"
     content {
