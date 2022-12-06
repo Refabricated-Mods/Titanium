@@ -8,6 +8,8 @@
 package com.hrznstudio.titanium.network;
 
 import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,6 +27,7 @@ public class NetworkHandler {
         i = 0;
         network = new SimpleChannel(new ResourceLocation(modid, "network"));
         network.initServerListener();
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) network.initClientListener();
     }
 
     public SimpleChannel get() {
