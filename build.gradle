@@ -109,6 +109,18 @@ dependencies {
   modApi "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 }
 
+processResources {
+
+  def toReplace = [
+    "version"             : project.version
+  ]
+
+  inputs.properties toReplace
+  filesMatching("fabric.mod.json") {
+    expand toReplace
+  }
+}
+
 task sourcesJar(type: Jar, dependsOn: classes) {
   classifier = 'sources'
   from sourceSets.main.allSource
