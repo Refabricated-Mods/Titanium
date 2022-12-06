@@ -121,11 +121,14 @@ processResources {
     expand toReplace
   }
 }
+java {
+  withSourcesJar()
+}
 
-task sourcesJar(type: Jar, dependsOn: classes) {
+/*task sourcesJar(type: Jar, dependsOn: classes) {
   classifier = 'sources'
   from sourceSets.main.allSource
-}
+}*/
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
   classifier = 'javadoc'
@@ -138,7 +141,7 @@ task deobfJar(type: Jar) {
 }
 
 artifacts {
-  archives sourcesJar
+  //archives sourcesJar
   archives javadocJar
   archives deobfJar
 }
@@ -149,10 +152,7 @@ publish.mustRunAfter(project.tasks.getByName("build"))
 publishing {
   publications {
     mavenJava(MavenPublication) {
-      artifact jar
-      artifact sourcesJar
-      artifact javadocJar
-      artifact deobfJar
+      from components.java
     }
   }
   repositories {
