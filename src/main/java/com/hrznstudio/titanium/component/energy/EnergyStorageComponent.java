@@ -17,16 +17,19 @@ import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.container.addon.IContainerAddonProvider;
 import com.hrznstudio.titanium.container.addon.IntReferenceHolderAddon;
 import com.hrznstudio.titanium.container.referenceholder.FunctionReferenceHolder;
+import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.LongTag;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 public class EnergyStorageComponent<T extends IComponentHarness> extends SimpleEnergyStorage implements
-    IScreenAddonProvider, IContainerAddonProvider {
+    IScreenAddonProvider, IContainerAddonProvider, INBTSerializable<LongTag> {
 
     private final int xPos;
     private final int yPos;
@@ -105,6 +108,16 @@ public class EnergyStorageComponent<T extends IComponentHarness> extends SimpleE
 
     public int getY() {
         return yPos;
+    }
+
+    @Override
+    public LongTag serializeNBT() {
+        return LongTag.valueOf(amount);
+    }
+
+    @Override
+    public void deserializeNBT(LongTag tag) {
+        this.amount = tag.getAsLong();
     }
 }
 
