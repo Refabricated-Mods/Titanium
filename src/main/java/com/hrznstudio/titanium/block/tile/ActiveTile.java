@@ -34,6 +34,7 @@ import com.hrznstudio.titanium.network.IButtonHandler;
 import com.hrznstudio.titanium.network.locator.LocatorFactory;
 import com.hrznstudio.titanium.network.locator.instance.TileEntityLocatorInstance;
 import com.hrznstudio.titanium.util.FacingUtil;
+import com.hrznstudio.titanium.util.TitaniumFluidUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
@@ -104,7 +105,7 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
     @Override
     @ParametersAreNonnullByDefault
     public InteractionResult onActivated(Player player, InteractionHand hand, Direction facing, double hitX, double hitY, double hitZ) {
-        if (multiTankComponent != null && FluidUtil.interactWithFluidHandler(player, hand, multiTankComponent.getCapabilityForSide(null).orElse(new MultiTankComponent.MultiTankCapabilityHandler(new ArrayList<>())))) {
+        if (multiTankComponent != null && TitaniumFluidUtil.interactWithFluidHandler(player, hand, multiTankComponent.getCapabilityForSide(FacingUtil.getFacingRelative(this.getFacingDirection(), facing)))) {
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

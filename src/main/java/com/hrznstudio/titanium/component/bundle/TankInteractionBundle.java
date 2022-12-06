@@ -94,9 +94,9 @@ public class TankInteractionBundle<T extends BasicTile & IComponentHarness> impl
         if (storage == null) return ItemStack.EMPTY;
         ItemStack stack = this.input.getStackInSlot(0).copy();
         stack.setCount(1);
-        TitaniumFluidUtil.FluidActionResult result = TitaniumFluidUtil.tryFillContainer(stack, storage, Integer.MAX_VALUE, execute);
+        TitaniumFluidUtil.FluidActionResult result = TitaniumFluidUtil.tryFillContainer(stack, storage, Long.MAX_VALUE, null, execute);
         if (result.isSuccess()) return result.getResult();
-        result = TitaniumFluidUtil.tryEmptyContainer(stack, storage, Integer.MAX_VALUE, execute);
+        result = TitaniumFluidUtil.tryEmptyContainer(stack, storage, Long.MAX_VALUE, null, execute);
         if (result.isSuccess()) return result.getResult();
         return ItemStack.EMPTY;
     }
