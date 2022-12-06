@@ -21,7 +21,7 @@ public class AnnotationUtil {
     public static List<Class> getAnnotatedClasses(Class<? extends Annotation> annotation) {
         List<Class> classList = new ArrayList<>();
         Type type = Type.getType(annotation);
-        for (ModFileScanData allScanDatum : ModList.get().getAllScanData()) {
+        /*for (ModFileScanData allScanDatum : ModList.get().getAllScanData()) {
             for (ModFileScanData.AnnotationData allScanDatumAnnotation : allScanDatum.getAnnotations()) {
                 if (Objects.equals(allScanDatumAnnotation.annotationData(), type)) {
                     try {
@@ -31,14 +31,14 @@ public class AnnotationUtil {
                     }
                 }
             }
-        }
+        }*/
         return classList;
     }
 
     public static List<Class> getFilteredAnnotatedClasses(Class<? extends Annotation> annotation, String filter) {
         List<Class> classList = new ArrayList<>();
         Type type = Type.getType(annotation);
-        for (ModFileScanData allScanDatum : ModList.get().getAllScanData()) {
+        /*for (ModFileScanData allScanDatum : ModList.get().getAllScanData()) {
             if (allScanDatum.getTargets().get(filter) == null) continue;
             for (ModFileScanData.AnnotationData allScanDatumAnnotation : allScanDatum.getAnnotations()) {
                 if (Objects.equals(allScanDatumAnnotation.annotationType(), type)) {
@@ -49,14 +49,14 @@ public class AnnotationUtil {
                     }
                 }
             }
-        }
+        }*/
         return classList;
     }
 
     public static List<Field> getAnnotatedFields(Class<? extends Annotation> annotation) {
         List<Field> fields = new ArrayList<>();
         Type type = Type.getType(annotation);
-        for (ModFileScanData allScanDatum : ModList.get().getAllScanData()) {
+        /*for (ModFileScanData allScanDatum : ModList.get().getAllScanData()) {
             for (ModFileScanData.AnnotationData annotationData : allScanDatum.getAnnotations()) {
                 if (Objects.equals(annotationData.annotationType(), type)) {
                     try {
@@ -70,7 +70,7 @@ public class AnnotationUtil {
                     }
                 }
             }
-        }
+        }*/
         return fields;
     }
 }
