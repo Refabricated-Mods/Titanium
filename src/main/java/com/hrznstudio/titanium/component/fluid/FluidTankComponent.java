@@ -32,6 +32,8 @@ import net.minecraft.nbt.CompoundTag;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class FluidTankComponent<T extends IComponentHarness> extends FluidTank implements IScreenAddonProvider,
         IContainerAddonProvider, INBTSerializable<CompoundTag> {
@@ -43,6 +45,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
     private Type tankType;
     private Action tankAction;
     private Runnable onContentChange;
+    protected BiPredicate<FluidVariant, Long> validator;
 
     public FluidTankComponent(String name, int amount, int posX, int posY) {
         super(amount);
@@ -53,6 +56,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
         this.tankAction = Action.BOTH;
         this.onContentChange = () -> {
         };
+        this.validator = (f, a) -> true;
     }
 
     /**
@@ -105,6 +109,14 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
         return this;
     }
 
+    public FluidTankComponent<T> setValidator(BiPredicate<FluidVariant,Long> validator)
+    {
+        if (validator != null) {
+            this.validator = validator;
+        }
+        return this;
+    }
+
     public Action getTankAction() {
         return tankAction;
     }
@@ -116,7 +128,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
 
     @Override
     public long insert(FluidVariant insertedVariant, long maxAmount, TransactionContext transaction) {
-        return getTankAction().canFill() ? super.insert(insertedVariant, maxAmount, transaction) : 0;
+        return getTankAction().canFill() && validator.test(insertedVariant, maxAmount) ? super.insert(insertedVariant, maxAmount, transaction) : 0;
     }
 
     @Override
