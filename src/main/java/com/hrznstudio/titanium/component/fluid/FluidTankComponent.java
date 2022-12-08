@@ -45,7 +45,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
     private Type tankType;
     private Action tankAction;
     private Runnable onContentChange;
-    protected BiPredicate<FluidVariant, Long> validator;
+    protected Predicate<FluidStack> validator;
 
     public FluidTankComponent(String name, int amount, int posX, int posY) {
         super(amount);
@@ -56,7 +56,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
         this.tankAction = Action.BOTH;
         this.onContentChange = () -> {
         };
-        this.validator = (f, a) -> true;
+        this.validator = (f) -> true;
     }
 
     /**
@@ -109,7 +109,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
         return this;
     }
 
-    public FluidTankComponent<T> setValidator(BiPredicate<FluidVariant,Long> validator)
+    public FluidTankComponent<T> setValidator(Predicate<FluidStack> validator)
     {
         if (validator != null) {
             this.validator = validator;
@@ -128,7 +128,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
 
     @Override
     public long insert(FluidVariant insertedVariant, long maxAmount, TransactionContext transaction) {
-        return getTankAction().canFill() && validator.test(insertedVariant, maxAmount) ? super.insert(insertedVariant, maxAmount, transaction) : 0;
+        return getTankAction().canFill() && validator.test(new FluidStack(insertedVariant, maxAmount)) ? super.insert(insertedVariant, maxAmount, transaction) : 0;
     }
 
     @Override
