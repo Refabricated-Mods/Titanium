@@ -10,6 +10,7 @@ package com.hrznstudio.titanium._impl.test.tile;
 import com.hrznstudio.titanium._impl.test.TwentyFourTestBlock;
 import com.hrznstudio.titanium.annotation.Save;
 import com.hrznstudio.titanium.api.IItemStackQuery;
+import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.client.screen.addon.WidgetScreenAddon;
@@ -60,12 +61,22 @@ public class TwentyFourTestTile extends PoweredTile<TwentyFourTestTile> {
             .setInputFilter(IItemStackQuery.ANYTHING.toSlotFilter()));
     }
 
+    @Environment(EnvType.CLIENT)
+    private static IScreenAddon createScreen() {
+        return new WidgetScreenAddon(30, -25, new EditBox(Minecraft.getInstance().font, 0, 0, 120, 20, new TextComponent("")));
+    }
+
+    @Environment(EnvType.CLIENT)
+    private static IScreenAddon createScreen1() {
+        return new WidgetScreenAddon(30, 185, new VolumeSlider(Minecraft.getInstance(), 0, 0, SoundSource.HOSTILE, 120));
+    }
+
     @Override
     @Environment(EnvType.CLIENT)
     public void initClient() {
         super.initClient();
-        this.addGuiAddonFactory(() -> new WidgetScreenAddon(30, 185, new VolumeSlider(Minecraft.getInstance(), 0, 0, SoundSource.HOSTILE, 120)));
-        this.addGuiAddonFactory(() -> new WidgetScreenAddon(30, -25, new EditBox(Minecraft.getInstance().font, 0, 0, 120, 20, new TextComponent(""))));
+        this.addGuiAddonFactory(TwentyFourTestTile::createScreen1);
+        this.addGuiAddonFactory(TwentyFourTestTile::createScreen);
     }
 
     @Override

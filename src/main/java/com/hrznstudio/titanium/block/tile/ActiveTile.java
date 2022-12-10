@@ -212,6 +212,7 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
     }
 
 
+    @Environment(EnvType.CLIENT)
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>(guiAddons);

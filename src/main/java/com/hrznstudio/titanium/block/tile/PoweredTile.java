@@ -15,6 +15,8 @@ import com.hrznstudio.titanium.block.BasicTileBlock;
 import com.hrznstudio.titanium.component.energy.EnergyStorageComponent;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -52,6 +54,7 @@ public abstract class PoweredTile<T extends PoweredTile<T>> extends ActiveTile<T
         return Sets.newHashSet(Direction.values());
     }
 
+    @Environment(EnvType.CLIENT)
     @Override
     @Nonnull
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {

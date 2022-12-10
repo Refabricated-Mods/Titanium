@@ -14,6 +14,8 @@ import com.hrznstudio.titanium.api.client.IScreenAddonProvider;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.container.addon.IContainerAddonProvider;
 import com.hrznstudio.titanium.network.IButtonHandler;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.nbt.CompoundTag;
@@ -36,6 +38,7 @@ public class ItemStackHarness implements IContainerAddonProvider, IScreenAddonPr
         this.capabilities = capabilities;
     }
 
+    @Environment(EnvType.CLIENT)
     @Override
     @Nonnull
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {

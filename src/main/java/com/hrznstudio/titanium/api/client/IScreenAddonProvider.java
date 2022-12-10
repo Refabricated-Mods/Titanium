@@ -8,11 +8,14 @@
 package com.hrznstudio.titanium.api.client;
 
 import com.hrznstudio.titanium.api.IFactory;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 public interface IScreenAddonProvider {
+    @Environment(EnvType.CLIENT)
     @Nonnull
     List<IFactory<? extends IScreenAddon>> getScreenAddons();
 

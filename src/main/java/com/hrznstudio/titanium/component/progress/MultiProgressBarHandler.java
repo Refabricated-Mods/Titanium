@@ -14,6 +14,8 @@ import com.hrznstudio.titanium.component.IComponentHandler;
 import com.hrznstudio.titanium.component.IComponentHarness;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.container.addon.IContainerAddonProvider;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +49,7 @@ public class MultiProgressBarHandler<T extends IComponentHarness> implements ISc
         }
     }
 
+    @Environment(EnvType.CLIENT)
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> list = new ArrayList<>();

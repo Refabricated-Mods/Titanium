@@ -32,8 +32,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import team.reborn.energy.api.EnergyStorage;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -164,7 +162,7 @@ public class SidedFluidTankComponent<T extends IComponentHarness> extends FluidT
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = super.getScreenAddons();
         if (hasFacingAddon)
-            addons.add(() -> new FacingHandlerScreenAddon(SidedComponentManager.ofRight(getFacingHandlerX(), getFacingHandlerY(), pos, AssetTypes.BUTTON_SIDENESS_MANAGER, 4), this, getTankType().getAssetType(), this.getComponentHarness() instanceof ActiveTile ? ((ActiveTile) this.getComponentHarness()).getFacingDirection() : Direction.NORTH));
+            addons.add(this::createScreenAddon);
         return addons;
     }
 
@@ -190,4 +188,8 @@ public class SidedFluidTankComponent<T extends IComponentHarness> extends FluidT
         return nbt;
     }
 
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreenAddon() {
+        return new FacingHandlerScreenAddon(SidedComponentManager.ofRight(getFacingHandlerX(), getFacingHandlerY(), pos, AssetTypes.BUTTON_SIDENESS_MANAGER, 4), this, getTankType().getAssetType(), this.getComponentHarness() instanceof ActiveTile ? ((ActiveTile) this.getComponentHarness()).getFacingDirection() : Direction.NORTH);
+    }
 }

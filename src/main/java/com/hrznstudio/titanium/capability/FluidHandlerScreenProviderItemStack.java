@@ -10,6 +10,8 @@ package com.hrznstudio.titanium.capability;
 import com.hrznstudio.titanium.api.IFactory;
 import com.hrznstudio.titanium.api.client.IScreenAddon;
 import com.hrznstudio.titanium.api.client.IScreenAddonProvider;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -35,6 +37,7 @@ public class FluidHandlerScreenProviderItemStack extends SingleVariantItemStorag
         this.capacity = capacity;
     }
 
+    @Environment(EnvType.CLIENT)
     @Nonnull
     @Override
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {

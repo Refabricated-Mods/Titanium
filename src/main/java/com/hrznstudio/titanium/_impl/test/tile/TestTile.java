@@ -30,6 +30,8 @@ import com.hrznstudio.titanium.component.inventory.SidedInventoryComponent;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import com.hrznstudio.titanium.component.sideness.IFacingComponent;
 import com.hrznstudio.titanium.util.FacingUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -90,6 +92,7 @@ public class TestTile extends PoweredTile<TestTile> implements IRedstoneReader {
                 .setColor(DyeColor.LIME));
         this.addTank(third = new FluidTankComponent<>("testTank", 8000, 130, 30));
         this.addButton(button = new ButtonComponent(-13, 1, 14, 14) {
+            @Environment(EnvType.CLIENT)
             @Override
             public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
                 return Collections.singletonList(() -> new StateButtonAddon(button, new StateButtonInfo(0, AssetTypes.BUTTON_SIDENESS_DISABLED), new StateButtonInfo(1, AssetTypes.BUTTON_SIDENESS_ENABLED), new StateButtonInfo(2, AssetTypes.BUTTON_SIDENESS_PULL), new StateButtonInfo(3, AssetTypes.BUTTON_SIDENESS_PUSH)) {

@@ -385,6 +385,7 @@ public class ProgressBarComponent<T extends IComponentHarness> implements INBTSe
 
     public enum BarDirection {
         VERTICAL_UP {
+            @Environment(EnvType.CLIENT)
             @Override
             public <T extends IComponentHarness> void render(PoseStack stack, Screen screen, int guiX, int guiY, IAssetProvider provider, ProgressBarScreenAddon<T> addon) {
                 IAsset assetBorder = IAssetProvider.getAsset(provider, AssetTypes.PROGRESS_BAR_BORDER_VERTICAL);
@@ -425,6 +426,7 @@ public class ProgressBarComponent<T extends IComponentHarness> implements INBTSe
             }
         },
         ARROW_RIGHT {
+            @Environment(EnvType.CLIENT)
             @Override
             public <T extends IComponentHarness> void render(PoseStack stack, Screen screen, int guiX, int guiY, IAssetProvider provider, ProgressBarScreenAddon<T> addon) {
                 AssetUtil.drawAsset(stack, screen, IAssetProvider.getAsset(provider, AssetTypes.PROGRESS_BAR_BACKGROUND_ARROW_HORIZONTAL), addon.getPosX() + guiX, addon.getPosY() + guiY);
@@ -452,6 +454,7 @@ public class ProgressBarComponent<T extends IComponentHarness> implements INBTSe
         },
 
         ARROW_DOWN {
+            @Environment(EnvType.CLIENT)
             @Override
             public <T extends IComponentHarness> void render(PoseStack stack, Screen screen, int guiX, int guiY, IAssetProvider provider, ProgressBarScreenAddon<T> addon) {
                 AssetUtil.drawAsset(stack, screen, IAssetProvider.getAsset(provider, AssetTypes.PROGRESS_BAR_BACKGROUND_ARROW_DOWN), addon.getPosX() + guiX, addon.getPosY() + guiY);
