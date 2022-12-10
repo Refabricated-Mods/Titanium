@@ -9,6 +9,7 @@ package com.hrznstudio.titanium.module;
 
 import com.hrznstudio.titanium.block.BasicBlock;
 import com.hrznstudio.titanium.block.BasicTileBlock;
+import com.hrznstudio.titanium.recipe.serializer.GenericSerializer;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +41,12 @@ public class RegistryHelper {
         if (object1 instanceof Item item) items.add(item);
         if (object1 instanceof BlockEntityType<?> type) blockEntityTypes.add(type);
         return object1;
+    }
+
+    public void registerGenericRecipeSerializers(GenericSerializer<?>... serializers){
+        for (var serializer : serializers) {
+            Registry.register(Registry.RECIPE_SERIALIZER, serializer.getRegistryName(), serializer);
+        }
     }
 
     public <T> T registerGeneric(Registry<T> cl, String name, Supplier<T> object) {
