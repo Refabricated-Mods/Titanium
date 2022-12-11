@@ -9,6 +9,7 @@ package com.hrznstudio.titanium.tab;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Supplier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
@@ -26,7 +27,7 @@ public class AdvancedTitaniumTab extends TitaniumTab {
     private Random random;
     private boolean shouldRandomise;
 
-    public AdvancedTitaniumTab(String label, boolean randomise) {
+    public AdvancedTitaniumTab(ResourceLocation label, boolean randomise) {
         super(label, null);
         stackSupplier = this::getCurrentIcon;
         this.shouldRandomise = randomise;
@@ -63,8 +64,9 @@ public class AdvancedTitaniumTab extends TitaniumTab {
         Collections.addAll(this.icons, icons);
     }
 
+    @Override
     @Nonnull
-    private ItemStack getCurrentIcon() {
+    public ItemStack getCurrentIcon() {
         updateIcon();
         return currentIcon.get();
     }

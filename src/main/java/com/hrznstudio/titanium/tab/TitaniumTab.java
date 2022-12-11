@@ -7,24 +7,29 @@
 
 package com.hrznstudio.titanium.tab;
 
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Supplier;
 
 public class TitaniumTab{
-    String label;
+    ResourceLocation label;
     protected Supplier<ItemStack> stackSupplier;
+    protected final CreativeModeTab tab;
 
-    public TitaniumTab(String label, Supplier<ItemStack> stackSupplier) {
+    public TitaniumTab(ResourceLocation label, Supplier<ItemStack> stackSupplier) {
         this.label = label;
         this.stackSupplier = stackSupplier;
+        tab = FabricItemGroupBuilder.create(label).icon(this::getCurrentIcon).build();
     }
 
-    public ItemStack makeIcon() {
+    public ItemStack getCurrentIcon() {
         return stackSupplier.get();
     }
 
-    public ItemStack getIconItem() {
-        return stackSupplier.get();
+    public CreativeModeTab getTab() {
+        return tab;
     }
 }
