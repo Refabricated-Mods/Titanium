@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
 public class CapabilityItemStackHolder {
-    static ItemApiLookup<IStackHolder, ContainerItemContext> ITEM =
+    public static final ItemApiLookup<IStackHolder, ContainerItemContext> ITEM =
         ItemApiLookup.get(new ResourceLocation("titanium:stack_holder"), IStackHolder.class, ContainerItemContext.class);
 
     public static void init(){
