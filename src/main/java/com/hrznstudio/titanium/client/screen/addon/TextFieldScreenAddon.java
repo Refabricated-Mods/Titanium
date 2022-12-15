@@ -12,6 +12,8 @@ import com.hrznstudio.titanium.api.client.IAsset;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -19,7 +21,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 
 
-
+@Environment(EnvType.CLIENT)
 public class TextFieldScreenAddon extends BasicScreenAddon {
     private EditBox textFieldWidget;
 

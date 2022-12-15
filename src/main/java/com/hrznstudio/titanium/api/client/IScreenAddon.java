@@ -9,6 +9,8 @@ package com.hrznstudio.titanium.api.client;
 
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -16,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import java.util.Collections;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public interface IScreenAddon extends GuiEventListener {
     /**
      * Draws the component in the background layer

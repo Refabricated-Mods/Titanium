@@ -14,12 +14,14 @@ import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
+@Environment(EnvType.CLIENT)
 public class ShadePickerAddon extends BasicScreenAddon {
 
     private static final int S_TILES = 10, V_TILES = 10;

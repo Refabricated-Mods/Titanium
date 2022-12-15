@@ -9,8 +9,10 @@ package com.hrznstudio.titanium.client.screen.addon;
 
 import com.hrznstudio.titanium.api.client.IAssetType;
 import com.hrznstudio.titanium.util.LangUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-
+@Environment(EnvType.CLIENT)
 public class StateButtonInfo {
 
     private final int state;

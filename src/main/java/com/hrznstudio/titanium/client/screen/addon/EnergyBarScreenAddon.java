@@ -13,6 +13,8 @@ import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -23,7 +25,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
-
+@Environment(EnvType.CLIENT)
 public class EnergyBarScreenAddon extends BasicScreenAddon {
 
     private final EnergyStorage handler;

@@ -15,6 +15,8 @@ import com.hrznstudio.titanium.component.inventory.InventoryComponent;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.awt.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
+@Environment(EnvType.CLIENT)
 public class SlotsScreenAddon<T extends IComponentHarness> extends BasicScreenAddon {
 
     private final InventoryComponent<T> handler;

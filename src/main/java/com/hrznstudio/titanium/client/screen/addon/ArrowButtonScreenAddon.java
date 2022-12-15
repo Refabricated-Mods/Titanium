@@ -15,8 +15,11 @@ import com.hrznstudio.titanium.component.button.ArrowButtonComponent;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.hrznstudio.titanium.util.FacingUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 
+@Environment(EnvType.CLIENT)
 public class ArrowButtonScreenAddon extends BasicButtonAddon {
 
     private ArrowButtonComponent button;

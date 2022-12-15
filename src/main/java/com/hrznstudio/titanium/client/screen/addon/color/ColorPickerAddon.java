@@ -10,12 +10,14 @@ package com.hrznstudio.titanium.client.screen.addon.color;
 import com.hrznstudio.titanium.client.screen.addon.BasicScreenAddon;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.awt.*;
 import java.util.function.Consumer;
-
+@Environment(EnvType.CLIENT)
 public class ColorPickerAddon extends BasicScreenAddon {
 
     private final Consumer<Integer> colorConsumer;

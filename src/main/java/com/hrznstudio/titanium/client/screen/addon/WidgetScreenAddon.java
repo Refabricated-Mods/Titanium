@@ -9,10 +9,12 @@ package com.hrznstudio.titanium.client.screen.addon;
 
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 
-
+@Environment(EnvType.CLIENT)
 public class WidgetScreenAddon extends BasicScreenAddon {
 
     private final AbstractWidget widget;

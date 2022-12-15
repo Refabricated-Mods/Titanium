@@ -18,6 +18,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -51,6 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("removal")
+@Environment(EnvType.CLIENT)
 public class TankScreenAddon extends BasicScreenAddon {
 
     private SingleSlotStorage<FluidVariant> tank;

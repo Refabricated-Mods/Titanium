@@ -13,6 +13,8 @@ import com.hrznstudio.titanium.component.button.ButtonComponent;
 import com.hrznstudio.titanium.network.locator.ILocatable;
 import com.hrznstudio.titanium.network.messages.ButtonClickNetworkMessage;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -25,6 +27,7 @@ import net.minecraft.sounds.SoundSource;
 import java.util.Collections;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class BasicButtonAddon extends BasicScreenAddon {
 
     private ButtonComponent button;

@@ -19,6 +19,8 @@ import com.hrznstudio.titanium.util.NBTUtil;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
@@ -28,7 +30,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
 import java.util.Objects;
-
+@Environment(EnvType.CLIENT)
 public class ItemstackFilterScreenAddon extends BasicScreenAddon {
 
     private final ItemStackFilter filter;

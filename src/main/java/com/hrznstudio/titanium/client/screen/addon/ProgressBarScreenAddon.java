@@ -11,6 +11,8 @@ import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.component.IComponentHarness;
 import com.hrznstudio.titanium.component.progress.ProgressBarComponent;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -20,7 +22,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
+@Environment(EnvType.CLIENT)
 public class ProgressBarScreenAddon<T extends IComponentHarness> extends BasicScreenAddon {
 
     private ProgressBarComponent<T> progressBar;

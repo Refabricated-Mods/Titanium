@@ -27,6 +27,8 @@ import com.hrznstudio.titanium.util.FacingUtil;
 import com.hrznstudio.titanium.util.LangUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -47,7 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-
+@Environment(EnvType.CLIENT)
 public class FacingHandlerScreenAddon extends BasicScreenAddon {
 
     private final IFacingComponent handler;

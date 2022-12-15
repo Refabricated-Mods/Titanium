@@ -12,10 +12,13 @@ import com.hrznstudio.titanium.api.client.IAssetType;
 import com.hrznstudio.titanium.client.screen.asset.IAssetProvider;
 import com.hrznstudio.titanium.util.AssetUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.awt.*;
 
+@Environment(EnvType.CLIENT)
 public class AssetScreenAddon extends BasicScreenAddon {
 
     private IAssetType assetType;
