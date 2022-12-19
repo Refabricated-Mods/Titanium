@@ -17,8 +17,8 @@ import net.minecraft.world.entity.player.Inventory;
 public class BasicAddonScreen extends BasicContainerScreen<BasicAddonContainer> {
     public BasicAddonScreen(BasicAddonContainer container, Inventory inventory, Component title) {
         super(container, inventory, title, container.getAssetProvider());
-        if (container.getProvider() instanceof IScreenAddonProvider) {
-            ((IScreenAddonProvider) container.getProvider()).getScreenAddons()
+        if (container.getProvider() instanceof IScreenAddonProvider screenAddonProvider) {
+            screenAddonProvider.getScreenAddons()
                 .stream()
                 .map(IFactory::create)
                 .forEach(this.getAddons()::add);
