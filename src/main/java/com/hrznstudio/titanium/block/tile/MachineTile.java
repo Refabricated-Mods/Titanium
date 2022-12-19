@@ -51,6 +51,11 @@ public abstract class MachineTile<T extends MachineTile<T>> extends PoweredTile<
         }
     }
 
+    @Environment(EnvType.CLIENT)
+    private static IScreenAddon createScreen() {
+        return new AssetScreenAddon(AssetTypes.AUGMENT_BACKGROUND, 175, 4, true);
+    }
+
     @Override
     @Environment(EnvType.CLIENT)
     public void initClient() {
@@ -98,7 +103,7 @@ public abstract class MachineTile<T extends MachineTile<T>> extends PoweredTile<
 
     @Environment(EnvType.CLIENT)
     public IFactory<? extends IScreenAddon> getAugmentBackground() {
-        return () -> new AssetScreenAddon(AssetTypes.AUGMENT_BACKGROUND, 175, 4, true);
+        return MachineTile::createScreen;
     }
 
     private List<ItemStack> getItemStackAugments() {

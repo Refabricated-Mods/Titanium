@@ -21,7 +21,6 @@ import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
@@ -80,7 +79,7 @@ public class EnergyStorageComponent<T extends IComponentHarness> extends SimpleE
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         return Lists.newArrayList(
-            () -> new EnergyBarScreenAddon(xPos, yPos, this)
+            this::createScreen
         );
     }
 
@@ -118,6 +117,11 @@ public class EnergyStorageComponent<T extends IComponentHarness> extends SimpleE
     @Override
     public void deserializeNBT(LongTag tag) {
         this.amount = tag.getAsLong();
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new EnergyBarScreenAddon(xPos, yPos, this);
     }
 }
 

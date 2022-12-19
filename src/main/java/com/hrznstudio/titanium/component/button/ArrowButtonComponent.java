@@ -29,10 +29,15 @@ public class ArrowButtonComponent extends ButtonComponent {
     @Override
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
-        return Collections.singletonList(() -> new ArrowButtonScreenAddon(this));
+        return Collections.singletonList(this::createScreen);
     }
 
     public FacingUtil.Sideness getDirection() {
         return direction;
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new ArrowButtonScreenAddon(this);
     }
 }

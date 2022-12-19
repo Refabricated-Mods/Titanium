@@ -29,10 +29,8 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class FluidTankComponent<T extends IComponentHarness> extends FluidTank implements IScreenAddonProvider,
@@ -148,7 +146,7 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>();
-        addons.add(() -> new TankScreenAddon(posX, posY, this, tankType));
+        addons.add(this::createScreen);
         return addons;
     }
 
@@ -167,6 +165,11 @@ public class FluidTankComponent<T extends IComponentHarness> extends FluidTank i
     @Override
     public void deserializeNBT(CompoundTag nbt) {
         this.readFromNBT(nbt);
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new TankScreenAddon(posX, posY, this, tankType);
     }
 
     public enum Type {

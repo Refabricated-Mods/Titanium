@@ -355,7 +355,7 @@ public class ProgressBarComponent<T extends IComponentHarness> implements INBTSe
     @Override
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
-        return Collections.singletonList(() -> new ProgressBarScreenAddon<>(posX, posY, this));
+        return Collections.singletonList(this::createScreen);
     }
 
     @Override
@@ -381,6 +381,11 @@ public class ProgressBarComponent<T extends IComponentHarness> implements INBTSe
         return Lists.newArrayList(
                 () -> new IntArrayReferenceHolderAddon(new ProgressBarReferenceHolder(this))
         );
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new ProgressBarScreenAddon<>(posX, posY, this);
     }
 
     public enum BarDirection {

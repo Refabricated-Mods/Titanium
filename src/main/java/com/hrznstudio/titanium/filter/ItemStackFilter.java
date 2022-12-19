@@ -132,11 +132,16 @@ public class ItemStackFilter implements IFilter<ItemStack> {
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> list = new ArrayList<>();
-        list.add(() -> new ItemstackFilterScreenAddon(this));
+        list.add(this::createScreen);
         return list;
     }
 
     public void onContentChanged() {
 
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new ItemstackFilterScreenAddon(this);
     }
 }

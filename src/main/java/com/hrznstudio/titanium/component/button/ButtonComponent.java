@@ -82,6 +82,11 @@ public class ButtonComponent implements IScreenAddonProvider {
     @Override
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
-        return Collections.singletonList(() -> new BasicButtonAddon(this));
+        return Collections.singletonList(this::createScreen);
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new BasicButtonAddon(this);
     }
 }

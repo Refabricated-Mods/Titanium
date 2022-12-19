@@ -16,7 +16,6 @@ import com.hrznstudio.titanium.component.IComponentHarness;
 import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.container.addon.IContainerAddonProvider;
 import com.hrznstudio.titanium.container.addon.SlotContainerAddon;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -357,7 +356,7 @@ public class InventoryComponent<T extends IComponentHarness> extends ItemStackHa
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
         List<IFactory<? extends IScreenAddon>> addons = new ArrayList<>();
-        addons.add(() -> new SlotsScreenAddon<>(this));
+        addons.add(this::createScreen);
         return addons;
     }
 
@@ -366,5 +365,10 @@ public class InventoryComponent<T extends IComponentHarness> extends ItemStackHa
         return Lists.newArrayList(
                 () -> new SlotContainerAddon(this, xPos, yPos, slotPosition)
         );
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new SlotsScreenAddon<>(this);
     }
 }

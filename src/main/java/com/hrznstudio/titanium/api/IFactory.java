@@ -9,6 +9,7 @@ package com.hrznstudio.titanium.api;
 
 import javax.annotation.Nonnull;
 
+@FunctionalInterface
 public interface IFactory<T> {
     @Nonnull
     T create();

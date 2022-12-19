@@ -58,17 +58,22 @@ public class LockableInventoryBundle<T extends BasicTile & IComponentHarness> im
         this.lockPosY = lockPosY;
         this.isLocked = isLocked;
         this.buttonAddon = new ButtonComponent(lockPosX, lockPosY, 14,14){
-            @Override
             @Environment(EnvType.CLIENT)
-            public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
-                return Collections.singletonList(() -> new StateButtonAddon(buttonAddon,
-                    new StateButtonInfo(0, AssetTypes.BUTTON_UNLOCKED, ChatFormatting.GOLD + LangUtil.getString("tooltip.titanium.locks") +  ChatFormatting.WHITE +  " " + LangUtil.getString("tooltip.titanium.facing_handler." + inventory.getName().toLowerCase())),
+            private IScreenAddon createScreen() {
+                return new StateButtonAddon(buttonAddon,
+                    new StateButtonInfo(0, AssetTypes.BUTTON_UNLOCKED, ChatFormatting.GOLD + LangUtil.getString("tooltip.titanium.locks") + ChatFormatting.WHITE + " " + LangUtil.getString("tooltip.titanium.facing_handler." + inventory.getName().toLowerCase())),
                     new StateButtonInfo(1, AssetTypes.BUTTON_LOCKED, ChatFormatting.GOLD + LangUtil.getString("tooltip.titanium.unlocks") + ChatFormatting.WHITE + " " + LangUtil.getString("tooltip.titanium.facing_handler." + inventory.getName().toLowerCase()))) {
                     @Override
                     public int getState() {
                         return LockableInventoryBundle.this.isLocked ? 1 : 0;
                     }
-                });
+                };
+            }
+
+            @Override
+            @Environment(EnvType.CLIENT)
+            public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
+                return Collections.singletonList(this::createScreen);
             }
         }.setPredicate((playerEntity, compoundNBT) -> {
                 this.isLocked = !this.isLocked;

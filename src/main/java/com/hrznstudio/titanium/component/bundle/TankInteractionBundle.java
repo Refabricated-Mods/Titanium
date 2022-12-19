@@ -21,9 +21,7 @@ import com.hrznstudio.titanium.container.addon.IContainerAddon;
 import com.hrznstudio.titanium.util.TitaniumFluidUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.util.FluidUtil;
 import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -104,7 +102,7 @@ public class TankInteractionBundle<T extends BasicTile & IComponentHarness> impl
     @Override
     @Environment(EnvType.CLIENT)
     public List<IFactory<? extends IScreenAddon>> getScreenAddons() {
-        return Collections.singletonList(() -> new AssetScreenAddon(AssetTypes.AUGMENT_BACKGROUND, posX, posY, true));
+        return Collections.singletonList(this::createScreen);
     }
 
     @Override
@@ -126,5 +124,10 @@ public class TankInteractionBundle<T extends BasicTile & IComponentHarness> impl
         this.input.deserializeNBT(nbt.getCompound("Input"));
         this.output.deserializeNBT(nbt.getCompound("Output"));
         this.bar.deserializeNBT(nbt.getCompound("Bar"));
+    }
+
+    @Environment(EnvType.CLIENT)
+    private IScreenAddon createScreen() {
+        return new AssetScreenAddon(AssetTypes.AUGMENT_BACKGROUND, posX, posY, true);
     }
 }
