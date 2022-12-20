@@ -16,6 +16,7 @@ import com.hrznstudio.titanium.Titanium;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.tropheusj.serialization_hooks.ingredient.IngredientDeserializer;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -25,7 +26,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.crafting.CraftingHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -104,7 +104,14 @@ public class JSONSerializableDataHandler {
                 return null;
             }
             return type.toJson();
-        }, CraftingHelper::getIngredient);
+        }, json -> {
+            Ingredient ing = null;
+            if (json.isJsonObject()) {
+                ing = IngredientDeserializer.tryDeserializeJson(json.getAsJsonObject());
+            }
+            if (ing == null) ing = Ingredient.fromJson(json);
+            return ing;
+        });
         map(Ingredient[].class, (type) -> {
             JsonArray array = new JsonArray();
             for (Ingredient ingredient : type) {

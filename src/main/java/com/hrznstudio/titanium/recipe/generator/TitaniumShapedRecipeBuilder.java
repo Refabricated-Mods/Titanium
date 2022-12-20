@@ -7,6 +7,7 @@
 
 package com.hrznstudio.titanium.recipe.generator;
 
+import io.github.fabricators_of_create.porting_lib.data.ConditionalRecipe;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -17,12 +18,11 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.ConditionalRecipe;
-import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 
 import java.util.function.Consumer;
 
-public class TitaniumShapedRecipeBuilder extends ShapedRecipeBuilder implements IConditionBuilder {
+//TODO figure this out
+public class TitaniumShapedRecipeBuilder extends ShapedRecipeBuilder{
 
     private ResourceLocation resourceLocation;
     private ConditionalRecipe.Builder conditional;
@@ -33,10 +33,7 @@ public class TitaniumShapedRecipeBuilder extends ShapedRecipeBuilder implements 
         super(resultIn, countIn);
         this.resourceLocation = resultIn.asItem().getRegistryName();
         this.build = false;
-        this.conditional = ConditionalRecipe.builder().addCondition(
-                and(
-                        itemExists(resourceLocation.getNamespace(), resourceLocation.getPath())
-                ));
+        this.conditional = ConditionalRecipe.builder().addCondition(itemExists(resourceLocation.getNamespace(), resourceLocation.getPath()));
     }
 
     public static TitaniumShapedRecipeBuilder shapedRecipe(ItemLike resultIn) {

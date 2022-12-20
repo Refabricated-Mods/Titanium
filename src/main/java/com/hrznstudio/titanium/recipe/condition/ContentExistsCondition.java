@@ -7,38 +7,34 @@
 
 package com.hrznstudio.titanium.recipe.condition;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.hrznstudio.titanium.Titanium;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraft.util.GsonHelper;
+
+import java.util.function.Predicate;
 
 
-public class ContentExistsCondition implements ICondition {
-    public static final ResourceLocation NAME = new ResourceLocation(Titanium.MODID, "content_exists");
+public class ContentExistsCondition implements Predicate<JsonObject> {
 
-    private final Registry<?> forgeRegistry;
-    private final ResourceLocation contentName;
-
-    public ContentExistsCondition(Registry<?> forgeRegistry, ResourceLocation contentName) {
-        this.forgeRegistry = forgeRegistry;
-        this.contentName = contentName;
+    public static JsonObject condition(Registry<?> registry, ResourceLocation id){
+        JsonObject json = new JsonObject();
+        json.addProperty("registry", registry.key().location().toString());
+        json.addProperty("name", id.toString());
+        return json;
     }
 
     @Override
-    public ResourceLocation getID() {
-        return NAME;
-    }
-
-    @Override
-    public boolean test() {
-        return forgeRegistry.containsKey(contentName);
-    }
-
-    public Registry<?> getForgeRegistry() {
-        return forgeRegistry;
-    }
-
-    public ResourceLocation getContentName() {
-        return this.contentName;
+    public boolean test(JsonObject jsonObject) {
+        String registryName = GsonHelper.getAsString(jsonObject, "registry");
+        Registry<?> registry = Registry.REGISTRY.get(new ResourceLocation(registryName));
+        if (registry == null) {
+            Titanium.LOGGER.catching(new JsonParseException("Didn't Find Registry for registry: " + registryName));
+            return false;
+        }
+        ResourceLocation id = new ResourceLocation(GsonHelper.getAsString(jsonObject, "name"));
+        return registry.containsKey(id);
     }
 }
