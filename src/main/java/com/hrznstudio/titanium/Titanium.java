@@ -69,7 +69,7 @@ public class Titanium extends ModuleController {
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStart);
         //EventManager.forge(PlayerEvent.PlayerLoggedInEvent.class).process(this::onPlayerLoggedIn).subscribe();
         //EventManager.mod(RegisterCapabilitiesEvent.class).process(CapabilityItemStackHolder::register).subscribe();
-        ResourceConditions.register(new ResourceLocation(Titanium.MODID, "content_exists"), new ContentExistsCondition());
+        ResourceConditions.register(new ResourceLocation(Titanium.MODID, "content_exists"), ContentExistsCondition::test);
     }
 
     @Override

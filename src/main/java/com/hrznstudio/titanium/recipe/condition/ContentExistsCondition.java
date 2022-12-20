@@ -10,6 +10,7 @@ package com.hrznstudio.titanium.recipe.condition;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.hrznstudio.titanium.Titanium;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -17,17 +18,17 @@ import net.minecraft.util.GsonHelper;
 import java.util.function.Predicate;
 
 
-public class ContentExistsCondition implements Predicate<JsonObject> {
+public class ContentExistsCondition implements ConditionJsonProvider {
 
-    public static JsonObject condition(Registry<?> registry, ResourceLocation id){
-        JsonObject json = new JsonObject();
-        json.addProperty("registry", registry.key().location().toString());
-        json.addProperty("name", id.toString());
-        return json;
+    private final Registry<?> registry;
+    private final ResourceLocation contentName;
+
+    public ContentExistsCondition(Registry<?> registry, ResourceLocation contentName) {
+        this.registry = registry;
+        this.contentName = contentName;
     }
 
-    @Override
-    public boolean test(JsonObject jsonObject) {
+    public static boolean test(JsonObject jsonObject) {
         String registryName = GsonHelper.getAsString(jsonObject, "registry");
         Registry<?> registry = Registry.REGISTRY.get(new ResourceLocation(registryName));
         if (registry == null) {
@@ -36,5 +37,16 @@ public class ContentExistsCondition implements Predicate<JsonObject> {
         }
         ResourceLocation id = new ResourceLocation(GsonHelper.getAsString(jsonObject, "name"));
         return registry.containsKey(id);
+    }
+
+    @Override
+    public ResourceLocation getConditionId() {
+        return new ResourceLocation(Titanium.MODID, "content_exists");
+    }
+
+    @Override
+    public void writeParameters(JsonObject json) {
+        json.addProperty("registry", registry.key().location().toString());
+        json.addProperty("name", contentName.toString());
     }
 }

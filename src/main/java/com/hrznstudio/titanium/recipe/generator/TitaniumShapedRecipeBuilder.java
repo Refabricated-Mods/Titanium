@@ -7,9 +7,12 @@
 
 package com.hrznstudio.titanium.recipe.generator;
 
+import com.hrznstudio.titanium.recipe.condition.ContentExistsCondition;
 import io.github.fabricators_of_create.porting_lib.data.ConditionalRecipe;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -21,8 +24,7 @@ import net.minecraft.world.level.ItemLike;
 
 import java.util.function.Consumer;
 
-//TODO figure this out
-public class TitaniumShapedRecipeBuilder extends ShapedRecipeBuilder{
+public class TitaniumShapedRecipeBuilder extends ShapedRecipeBuilder {
 
     private ResourceLocation resourceLocation;
     private ConditionalRecipe.Builder conditional;
@@ -33,7 +35,7 @@ public class TitaniumShapedRecipeBuilder extends ShapedRecipeBuilder{
         super(resultIn, countIn);
         this.resourceLocation = resultIn.asItem().getRegistryName();
         this.build = false;
-        this.conditional = ConditionalRecipe.builder().addCondition(itemExists(resourceLocation.getNamespace(), resourceLocation.getPath()));
+        this.conditional = ConditionalRecipe.builder().addCondition(new ContentExistsCondition(Registry.ITEM, resourceLocation));
     }
 
     public static TitaniumShapedRecipeBuilder shapedRecipe(ItemLike resultIn) {
