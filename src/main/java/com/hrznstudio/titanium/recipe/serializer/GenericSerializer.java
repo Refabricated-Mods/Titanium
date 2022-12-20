@@ -99,7 +99,7 @@ public class GenericSerializer<T extends SerializableRecipe>  implements RecipeS
             JsonArray recipes = new JsonArray();
             JsonObject filteredRecipe = new JsonObject();
             JsonArray conditions = new JsonArray();
-            conditions.add(recipe.getOutputCondition().getRight().getJson(recipe.getOutputCondition().getLeft()));
+            conditions.add(recipe.getOutputCondition().toJson());
             filteredRecipe.add("conditions", conditions);
             filteredRecipe.add("recipe", object);
             recipes.add(filteredRecipe);
