@@ -7,25 +7,37 @@
 
 package com.hrznstudio.titanium._impl.test;
 
+import com.hrznstudio.titanium._impl.TagConfig;
 import com.hrznstudio.titanium.annotation.config.ConfigFile;
 import com.hrznstudio.titanium.annotation.config.ConfigVal;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
-@ConfigFile
-public class TitaniumConfig {
+@Config(name = "titanium/titanium")
+public class TitaniumConfig implements ConfigData {
+    @ConfigEntry.Gui.Excluded
+    public static TitaniumConfig INSTANCE;
 
-    @ConfigVal(comment = "A Boolean that is true by default")
-    public static boolean thisIsABoolean = true;
-    @ConfigVal(comment = "A Boolean that is false by default", value = "NOT_BOOLEAN")
-    public static boolean thisIsNotABoolean = false;
-    @ConfigVal
-    public static int intAngery = 7;
-    @ConfigVal
-    public static Dabber dabber = new Dabber();
+    @Comment(value = "A Boolean that is true by default")
+    public boolean thisIsABoolean = true;
+    @Comment(value = "A Boolean that is false by default")
+    public boolean thisIsNotABoolean = false;
+    public int intAngery = 7;
+    @ConfigEntry.Gui.CollapsibleObject
+    public Dabber dabber = new Dabber();
 
     public static class Dabber {
 
-        @ConfigVal
-        public static String dabby = "lil dab";
+        public String dabby = "lil dab";
 
+    }
+
+    public static void init(){
+        AutoConfig.register(TitaniumConfig.class, JanksonConfigSerializer::new);
+        INSTANCE = AutoConfig.getConfigHolder(TitaniumConfig.class).getConfig();
     }
 }

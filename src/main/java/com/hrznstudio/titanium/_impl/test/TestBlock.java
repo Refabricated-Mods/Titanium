@@ -20,11 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 
-@ConfigFile.Child(TitaniumConfig.class)
 public class TestBlock extends RotatableBlock<TestTile> {
-
-    @ConfigVal
-    public static int DUMB_VALUE = 135;
 
     public static Pair<Block, BlockEntityType<?>> TEST;
 

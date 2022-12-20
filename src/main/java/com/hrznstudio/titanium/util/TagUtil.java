@@ -109,7 +109,7 @@ public class TagUtil {
         Collection<Item> collection = getAllEntries(Registry.ITEM, tagKey);
         if (collection.isEmpty()) return ItemStack.EMPTY;
         List<Item> elements = collection.stream().toList();
-        for (String modid : TagConfig.ITEM_PREFERENCE) {
+        for (String modid : TagConfig.INSTANCE.ITEM_PREFERENCE) {
             for (Item allElement : collection) {
                 if (allElement.getRegistryName().getNamespace().equalsIgnoreCase(modid)) return new ItemStack(allElement);
             }

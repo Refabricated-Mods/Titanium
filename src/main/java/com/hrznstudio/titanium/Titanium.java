@@ -7,11 +7,9 @@
 
 package com.hrznstudio.titanium;
 
+import com.hrznstudio.titanium._impl.TagConfig;
 import com.hrznstudio.titanium._impl.creative.CreativeFEGeneratorBlock;
-import com.hrznstudio.titanium._impl.test.AssetTestBlock;
-import com.hrznstudio.titanium._impl.test.MachineTestBlock;
-import com.hrznstudio.titanium._impl.test.TestBlock;
-import com.hrznstudio.titanium._impl.test.TwentyFourTestBlock;
+import com.hrznstudio.titanium._impl.test.*;
 import com.hrznstudio.titanium.block.tile.PoweredTile;
 import com.hrznstudio.titanium.capability.CapabilityItemStackHolder;
 import com.hrznstudio.titanium.command.RewardCommand;
@@ -75,6 +73,8 @@ public class Titanium extends ModuleController {
     @Override
     public void onInit() {
         super.onInit();
+        TagConfig.init();
+        //TitaniumConfig.init();
     }
 
     @Override
