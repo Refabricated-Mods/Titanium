@@ -46,5 +46,6 @@
   "tooltip.titanium.redstone.redstone": "Redstone Mode: Run with redstone signal",
   "tooltip.titanium.redstone.once": "Redstone Mode: Run on Pulse",
   "tooltip.titanium.unlocks": "Unlocks:",
-  "tooltip.titanium.locks": "Locks:"
+  "tooltip.titanium.locks": "Locks:",
+  "text.autoconfig.titanium-tags.option.itemPreference": "Item Preferences"
 }

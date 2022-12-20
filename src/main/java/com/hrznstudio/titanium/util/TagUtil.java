@@ -8,7 +8,6 @@
 package com.hrznstudio.titanium.util;
 
 import com.hrznstudio.titanium._impl.TagConfig;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -109,7 +108,7 @@ public class TagUtil {
         Collection<Item> collection = getAllEntries(Registry.ITEM, tagKey);
         if (collection.isEmpty()) return ItemStack.EMPTY;
         List<Item> elements = collection.stream().toList();
-        for (String modid : TagConfig.INSTANCE.ITEM_PREFERENCE) {
+        for (String modid : TagConfig.INSTANCE.itemPreference) {
             for (Item allElement : collection) {
                 if (allElement.getRegistryName().getNamespace().equalsIgnoreCase(modid)) return new ItemStack(allElement);
             }
