@@ -53,6 +53,7 @@ public class TitaniumFluidUtil {
                     return new FluidActionResult(context.getItemVariant().toStack());
                 }
             }
+            transaction.abort();
             return FluidActionResult.FAILURE;
         }).orElse(FluidActionResult.FAILURE);
     }
@@ -80,6 +81,7 @@ public class TitaniumFluidUtil {
                 }
             }
         }
+        transaction.abort();
         return FluidActionResult.FAILURE;
     }
 

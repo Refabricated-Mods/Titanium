@@ -152,6 +152,7 @@ public class SidedFluidTankComponent<T extends IComponentHarness> extends FluidT
             Transaction transaction = Transaction.openOuter();
             long drain = from.extract(stack.getType(), to.insert(stack.getType(), stack.getAmount(), transaction), transaction);
             if (drain > 0) transaction.commit();
+            else transaction.abort();
             return drain > 0;
         }
         return false;

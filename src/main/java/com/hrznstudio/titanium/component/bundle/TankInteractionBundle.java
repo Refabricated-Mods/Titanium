@@ -74,7 +74,7 @@ public class TankInteractionBundle<T extends BasicTile & IComponentHarness> impl
                     transaction.commit();
                     this.input.getStackInSlot(0).shrink(1);
                     componentHarness.setChanged();
-                }
+                } else transaction.abort();
             })
             .setComponentHarness(componentHarness);
 

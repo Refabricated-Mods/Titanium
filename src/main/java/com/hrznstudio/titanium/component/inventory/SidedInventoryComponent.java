@@ -196,11 +196,11 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
     }
 
     private boolean transfer(FacingUtil.Sideness sideness, Storage<ItemVariant> from, Storage<ItemVariant> to, int workAmount) {
-        for (StorageView<ItemVariant> view : from.iterable(Transaction.openOuter())){
+        Transaction transaction = Transaction.openOuter();
+        for (StorageView<ItemVariant> view : from.iterable(transaction)){
             if (view.isResourceBlank()) continue;
             long extract = from.simulateExtract(view.getResource(), workAmount, null);
             if (extract > 0){
-                Transaction transaction = Transaction.openOuter();
                 long insert = to.insert(view.getResource(), extract, transaction);
                 if (insert > 0){
                     long realExtract = from.extract(view.getResource(), insert, transaction);
@@ -211,6 +211,7 @@ public class SidedInventoryComponent<T extends IComponentHarness> extends Invent
                 }
             }
         }
+        transaction.abort();
         return false;
     }
 

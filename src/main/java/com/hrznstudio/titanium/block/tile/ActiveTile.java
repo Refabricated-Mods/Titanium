@@ -315,14 +315,14 @@ public abstract class ActiveTile<T extends ActiveTile<T>> extends BasicTile<T> i
                                         amount = fluidTankComponent.insert(fluidStack.getType(), fluidStack.getAmount(), transaction);
                                         carriedStorage.extract(fluidStack.getType(), amount, transaction);
                                         transaction.commit();
-                                    }
+                                    } else transaction.abort();
                                 } else {
                                     FluidStack fluidStack = TransferUtil.simulateExtractAnyFluid(fluidTankComponent, amount);
                                     if (!fluidStack.isEmpty()){
                                         amount = carriedStorage.insert(fluidStack.getType(), fluidStack.getAmount(), transaction);
                                         fluidTankComponent.extract(fluidStack.getType(), amount, transaction);
                                         transaction.commit();
-                                    }
+                                    } else transaction.abort();
                                 }
                                 //TODO figure out
                                 //playerEntity.containerMenu.setCarried(iFluidHandlerItem.getContainer().copy());

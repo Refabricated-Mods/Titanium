@@ -36,15 +36,15 @@ public class CreativeFEGeneratorTile extends PoweredTile<CreativeFEGeneratorTile
         super.serverTick(level, pos, state, blockEntity);
         Transaction transaction = Transaction.openOuter();
         this.getEnergyStorage().insert(Integer.MAX_VALUE, transaction);
-        transaction.commit();
         for (Direction direction : Direction.values()) {
             EnergyStorage iEnergyStorage = EnergyStorage.SIDED.find(level, pos.relative(direction), direction.getOpposite());
             if (iEnergyStorage != null) {
-                transaction = Transaction.openOuter();
+                Transaction transactionNested = Transaction.openNested(transaction);
                 iEnergyStorage.insert(Integer.MAX_VALUE, transaction);
-                transaction.commit();
+                transactionNested.commit();
             }
         }
+        transaction.commit();
         markForUpdate();
     }
 

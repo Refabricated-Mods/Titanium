@@ -105,7 +105,7 @@ public abstract class GeneratorTile<T extends GeneratorTile<T>> extends PoweredT
                 if (energy > 0){
                     this.getEnergyStorage().extract(energy, transaction);
                     transaction.commit();
-                }
+                } else transaction.abort();
             }
         }
     }
